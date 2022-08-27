@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-const Cat = mongoose.model('Cat', { name: String });
-const User = mongoose.model('User', { username: String });
+const User = mongoose.model('User', { username: String, password: String });
 
-module.exports = { Cat, User }
+module.exports = { User }

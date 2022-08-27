@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "nodemon ./bin/www"
+    "dev": "nodemon ./bin/www",
+    "fixtures:load": "node fixtures.js"
   },
   "dependencies": {
     "debug": "~2.6.9",
