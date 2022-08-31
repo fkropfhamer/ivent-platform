@@ -15,9 +15,18 @@ router.post('/register', async (req, res, next) => {
 
   const newUser = new User({ username, password });
 
-  await newUser.save();
+  try {
+    await newUser.save();  
+  } catch (e) {
+    if (e.code === 11000) {
+      return res.status(400).json({ status: "username already in use"});
+    }
 
-  res.json('respond with a resource');
+    return res.status(400).json({ error: "error"});
+  }
+  
+
+  res.json({ status: 'user created'});
 });
 
 router.get('/', async (req, res) => {
