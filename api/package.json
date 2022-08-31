@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "nodemon ./bin/www",
-    "fixtures:load": "node fixtures.js"
+    "fixtures:load": "node scripts/fixtures.js",
+    "resetdb": "node scripts/resetDb.js"
   },
   "dependencies": {
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.3",
     "morgan": "~1.9.1"
   },

@@ -5,6 +5,14 @@ const { User } = require('../../data/models')
 router.post('/register', async (req, res, next) => {
   const { username, password } = req.body; 
 
+  if (!username) {
+    return res.status(400).json({status: "no username provided"});
+  }
+
+  if (!password) {
+    return res.status(400).json({status: "no password provided"});
+  }
+
   const newUser = new User({ username, password });
 
   await newUser.save();
@@ -15,7 +23,7 @@ router.post('/register', async (req, res, next) => {
 router.get('/', async (req, res) => {
   const users = await User.find();
 
-  res.json({ users })
+  res.json(users)
 });
 
 router.get('/:userId', async (req, res) => {
@@ -32,6 +40,14 @@ router.get('/:userId', async (req, res) => {
   } else {
     res.status(404).json({ status: 'user not found'});
   }
+});
+
+router.delete('/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  await User.deleteOne({ _id: userId});
+
+  res.json({ success: true });
 });
 
 module.exports = router;
