@@ -9,14 +9,11 @@ const mongoose = require('mongoose');
 
     const collections = await db.listCollections().toArray();
 
-    collections
-      .map((collection) => collection.name)
-      .forEach(async (collectionName) => {
-        console.log(`dropping collection ${collectionName}`);
+    for (const collection of collections) {
+      console.log(`dropping collection ${collection.name}`);
 
-        db.dropCollection(collectionName);
-      });
-
+      await db.dropCollection(collection.name);
+    }
 
     console.log("dropped all collections!");
 

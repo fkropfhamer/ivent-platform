@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../../data/models')
+const { User } = require('../../data/models');
+const { hashPassword, createUserWithHashedPassword } = require('./auth');
 
 router.post('/register', async (req, res, next) => {
   const { username, password } = req.body; 
@@ -13,7 +14,7 @@ router.post('/register', async (req, res, next) => {
     return res.status(400).json({status: "no password provided"});
   }
 
-  const newUser = new User({ username, password });
+  const newUser = await createUserWithHashedPassword(username, password);
 
   try {
     await newUser.save();  

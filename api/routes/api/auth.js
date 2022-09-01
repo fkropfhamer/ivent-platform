@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const express = require("express");
+const argon2 = require('argon2');
 const { User } = require("../../data/models");
+
 const router = express.Router();
 
 const secret = 'secret';
@@ -18,7 +20,7 @@ router.post('/login', async (req, res) => {
         return res.status(401).json({ status: "bad username or password"})
     }
 
-    if (isPasswordCorrect(user, password)) {
+    if (await isPasswordCorrect(user, password)) {
         return res.json({ jwt: generateAccessToken(user)});
     }
 
@@ -26,14 +28,23 @@ router.post('/login', async (req, res) => {
 });
 
 
-function isPasswordCorrect(user, password) {
-    return user.password === password;
+async function isPasswordCorrect(user, password) {
+    return argon2.verify(user.password, password);
 }
 
+async function hashPassword(password) {
+    return argon2.hash(password);
+}
+
+async function createUserWithHashedPassword(username, password) {
+    const passwordHash = await hashPassword(password);
+
+    return new User({ username, password: passwordHash });
+}
 
 function generateAccessToken(username) {
     return jwt.sign({ username }, secret, { expiresIn: '1800s' });
 }
 
 
-module.exports = { router };
+module.exports = { router, createUserWithHashedPassword };

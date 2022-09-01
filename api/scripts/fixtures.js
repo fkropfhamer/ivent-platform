@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { User, Event } = require('../data/models');
+const { createUserWithHashedPassword } = require('../routes/api/auth');
 
 (async function loadFixtures() {
     await mongoose.connect('mongodb://localhost:27017');
@@ -12,8 +13,8 @@ const { User, Event } = require('../data/models');
 
 
 async function loadUserFixtures() {
-    await (new User({ username: 'user1', password: '123456' })).save(); 
-    await (new User({ username: 'admin', password: 'test123'})).save();
+    await (await createUserWithHashedPassword('user1', '123456')).save(); 
+    await (await createUserWithHashedPassword('admin', 'test123')).save();
 }
 
 async function loadEventFixtures() {

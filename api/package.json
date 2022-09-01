@@ -8,6 +8,7 @@
     "resetdb": "node scripts/resetDb.js"
   },
   "dependencies": {
+    "argon2": "^0.29.1",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.1",
