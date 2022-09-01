@@ -1,7 +1,7 @@
 import reactLogo from '../assets/react.svg'
 import { useDispatch, useSelector } from 'react-redux'
 import { incremented } from '../features/counter/counter-slice';
-import { useFetchEventsQuery } from '../features/events/events-api-slice';
+import { useFetchEventsQuery } from '../services/api';
 import { Link } from 'react-router-dom';
 
 

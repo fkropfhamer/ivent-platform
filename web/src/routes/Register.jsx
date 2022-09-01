@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom"
-import { useRegisterUserMutation } from "../features/users/users-api-slice";
+import { useRegisterUserMutation } from "../services/api";
 
 
 

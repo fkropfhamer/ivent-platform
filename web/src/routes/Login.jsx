@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom"
-import { useLoginMutation } from "../features/auth/auth-api-slice";
+import { setToken } from "../features/auth/auth-slice";
+import { useLoginMutation } from "../services/api";
 
 
 
@@ -8,6 +10,7 @@ import { useLoginMutation } from "../features/auth/auth-api-slice";
 export const Login = () => {
     const navigate = useNavigate();
     const [login, { isLoading }] = useLoginMutation();
+    const dispatch = useDispatch();
 
     const [formState, setFormState] = useState({
         username: '',
@@ -16,6 +19,7 @@ export const Login = () => {
 
     const onFormSubmit = async () => {
         const token = await login(formState).unwrap();
+        dispatch(setToken(token))
 
         console.log(token);
         //navigate("/login")
