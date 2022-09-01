@@ -1,18 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const apiSlice = createApi({
-    reducerPath: 'events-api',
+    reducerPath: 'users-api',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:3000/api/v1/events',
+        baseUrl: 'http://localhost:3000/api/v1/users',
         prepareHeaders(headers) {
             return headers;
         }
     }),
     endpoints(builder) {
         return {
-            fetchEvents: builder.query({ query: () => '/' })
+            registerUser: builder.mutation({ query: (credentials) => ({ url: '/register', method: 'POST', body: credentials }) })
         }
     }
 });
 
-export const { useFetchEventsQuery } = apiSlice;
+export const { useRegisterUserMutation } = apiSlice;

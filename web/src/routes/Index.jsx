@@ -2,6 +2,7 @@ import reactLogo from '../assets/react.svg'
 import { useDispatch, useSelector } from 'react-redux'
 import { incremented } from '../features/counter/counter-slice';
 import { useFetchEventsQuery } from '../features/events/events-api-slice';
+import { Link } from 'react-router-dom';
 
 
 function Index() {
@@ -31,6 +32,8 @@ function Index() {
         <p>
           {isFetching ? "loading" : `Number of events fetched ${data.length}`} 
         </p>
+        <Link to="/register">register</Link>
+        <Link to="/login">login</Link>
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
