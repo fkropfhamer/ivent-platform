@@ -22,7 +22,8 @@ export const Login = () => {
         dispatch(setToken(token))
 
         console.log(token);
-        //navigate("/login")
+        
+        navigate("/profile")
     }
 
 

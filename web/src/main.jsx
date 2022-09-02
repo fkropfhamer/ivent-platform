@@ -8,6 +8,7 @@ import './index.css'
 import Index from './routes/Index'
 import { Login } from './routes/Login'
 import { Register } from './routes/Register'
+import { Profile } from './routes/Profile'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -17,6 +18,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path='/' element={<App />}>
             <Route path='login' element={<Login />} />
             <Route path='register' element={<Register />} />
+            <Route path='profile' element={<Profile />} />
             <Route index element={<Index />} />
           </Route>
         </Routes>

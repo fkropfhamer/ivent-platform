@@ -5,6 +5,10 @@ const initialState = { accessToken: null };
 const authSlice = createSlice({ name: 'auth', initialState, reducers: {
     setToken(state, action) {
         state.accessToken = action.payload.jwt;
+    },
+
+    logout(state) {
+        state.accessToken = null
     }
 }});
 
