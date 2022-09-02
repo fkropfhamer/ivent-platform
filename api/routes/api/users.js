@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require('../../data/models');
-const { hashPassword, createUserWithHashedPassword } = require('./auth');
+const { createUserWithHashedPassword, auth } = require('./auth');
 
 router.post('/register', async (req, res, next) => {
   const { username, password } = req.body; 
@@ -26,7 +26,6 @@ router.post('/register', async (req, res, next) => {
     return res.status(400).json({ error: "error"});
   }
   
-
   res.json({ status: 'user created'});
 });
 
@@ -39,11 +38,7 @@ router.get('/', async (req, res) => {
 router.get('/:userId', async (req, res) => {
   const { userId } = req.params;
 
-  console.log(userId);
-
   const user = await User.findById(userId).exec();
-
-  console.log(user);
 
   if (user) {
     res.json(user);
