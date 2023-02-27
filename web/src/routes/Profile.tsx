@@ -7,16 +7,15 @@ export const Profile = () => {
         return <h1>Loading...</h1>
     }
 
-
-    if (error) {
+    if (error && 'data' in error) {
         return <h1>{error.status} {JSON.stringify(error.data)}</h1>
     }
 
     return <>
         <h1>Profile</h1>
         <ul>
-            <li>Username: {profile.username}</li>
-            <li>Id: { profile._id }</li>
+            <li>Username: {profile?.username}</li>
+            <li>Id: { profile?._id }</li>
         </ul>
 
     </>
