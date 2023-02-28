@@ -33,6 +33,7 @@ func NewRouter(handler *gin.Engine) {
 		userRouter := apiRouter.Group("/user")
 		{
 			userRouter.GET("/profile", api.ProfileHandle)
+			userRouter.GET("/user", api.CreateUserHandle)
 		}
 	}	
 }
