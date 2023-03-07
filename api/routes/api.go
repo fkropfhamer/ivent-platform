@@ -35,6 +35,7 @@ func NewRouter(handler *gin.Engine) {
 		{
 			userRouter.GET("/profile", api.ProfileHandle)
 			userRouter.POST("/", api.CreateUserHandle)
+			userRouter.POST("/register", api.RegisterHandle)
 		}
 	}
 }
