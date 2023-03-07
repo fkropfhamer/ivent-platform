@@ -31,7 +31,7 @@ func NewRouter(handler *gin.Engine) {
 			authRouter.POST("/login", api.LoginHandle)
 		}
 
-		userRouter := apiRouter.Group("/user")
+		userRouter := apiRouter.Group("/users")
 		{
 			userRouter.GET("/profile", api.ProfileHandle)
 			userRouter.POST("/", api.CreateUserHandle)
