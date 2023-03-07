@@ -2,31 +2,38 @@ package api
 
 import (
 	"context"
-	"time"
 	"net/http"
-	"github.com/gin-gonic/gin"
-	"networking-events-api/models"
 	"networking-events-api/db"
+	"networking-events-api/models"
+	"time"
+
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-
-
 func ProfileHandle(c *gin.Context) {
+	_, err := Authenticate(c)
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "profile",
 	})
 }
 
-
 func CreateUserHandle(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    
-    defer cancel()
 
+	defer cancel()
 
 	newUser := models.User{
-		Id: primitive.NewObjectID(),
+		Id:   primitive.NewObjectID(),
 		Name: "a",
 	}
 
@@ -38,7 +45,6 @@ func CreateUserHandle(c *gin.Context) {
 		})
 		return
 	}
-
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "user created",
