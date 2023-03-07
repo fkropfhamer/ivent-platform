@@ -6,6 +6,11 @@ interface Profile {
     id: string,
 }
 
+interface Event {
+    name: string,
+    id: string
+}
+
 export const apiSlice = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({
@@ -22,7 +27,7 @@ export const apiSlice = createApi({
     endpoints(builder) {
         return {
             login: builder.mutation({ query: (credentials) => ({ url: 'auth/login', method: 'POST', body: credentials }) }),
-            fetchEvents: builder.query({ query: () => 'events' }),
+            fetchEvents: builder.query<[Event], void>({ query: () => 'events', transformResponse: (response: { events: [Event]}) => response.events }),
             registerUser: builder.mutation({ query: (credentials) => ({ url: 'users/register', method: 'POST', body: credentials }) }),
             profile: builder.query<Profile, void>({ query: () => 'users/profile'}),
         }

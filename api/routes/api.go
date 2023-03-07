@@ -34,14 +34,14 @@ func NewRouter(handler *gin.Engine) {
 		userRouter := apiRouter.Group("/users")
 		{
 			userRouter.GET("/profile", api.ProfileHandle)
-			userRouter.POST("/", api.CreateUserHandle)
+			userRouter.POST("", api.CreateUserHandle)
 			userRouter.POST("/register", api.RegisterHandle)
 		}
 
 		eventRouter := apiRouter.Group("/events")
 		{
-			eventRouter.POST("/", api.CreateEventHandler)
-			eventRouter.GET("/", api.ListEventsHandler)
+			eventRouter.POST("", api.CreateEventHandler)
+			eventRouter.GET("", api.ListEventsHandler)
 		}
 	}
 }

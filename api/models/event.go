@@ -13,7 +13,7 @@ import (
 
 type Event struct {
 	ID      primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name    string
+	Name    string             `json:"name"`
 	Creator primitive.ObjectID
 }
 
