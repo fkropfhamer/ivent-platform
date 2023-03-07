@@ -1,11 +1,8 @@
 package api
 
 import (
-	"context"
 	"net/http"
-	"networking-events-api/db"
 	"networking-events-api/models"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -27,17 +24,27 @@ func ProfileHandle(c *gin.Context) {
 	})
 }
 
-func CreateUserHandle(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+type createUserRequestBody struct {
+	Username string
+	Password string
+}
 
-	defer cancel()
+func CreateUserHandle(c *gin.Context) {
+	var body createUserRequestBody
+
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "error",
+		})
+		return
+	}
 
 	newUser := models.User{
 		Id:   primitive.NewObjectID(),
-		Name: "a",
+		Name: body.Username,
 	}
 
-	_, err := db.UserCollection.InsertOne(ctx, newUser)
+	err := models.CreateUser(&newUser)
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
