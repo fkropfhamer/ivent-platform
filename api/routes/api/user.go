@@ -1,18 +1,44 @@
 package api
 
 import (
+	"context"
 	"net/http"
+	"networking-events-api/db"
 	"networking-events-api/models"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func ProfileHandle(c *gin.Context) {
-	_, err := Authenticate(c)
+	userId, err := Authenticate(c)
 
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	userObjectId, err := primitive.ObjectIDFromHex(userId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	var user models.User
+	filter := bson.M{"id": userObjectId}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := db.UserCollection.FindOne(ctx, filter).Decode(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "error",
 		})
 
@@ -20,7 +46,9 @@ func ProfileHandle(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "profile",
+		"message":  "profile",
+		"username": user.Name,
+		"id":       userId,
 	})
 }
 

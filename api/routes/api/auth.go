@@ -14,7 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -38,11 +37,11 @@ func createJWT(user *models.User) string {
 	return tokenString
 }
 
-func Authenticate(c *gin.Context) (*models.User, error) {
+func Authenticate(c *gin.Context) (string, error) {
 	tokenString, err := extractToken(c)
 
 	if err != nil {
-		return nil, errors.New("no token")
+		return "", errors.New("no token")
 	}
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -54,17 +53,14 @@ func Authenticate(c *gin.Context) (*models.User, error) {
 	})
 
 	if err != nil {
-		return nil, errors.New("invalid token")
+		return "", errors.New("invalid token")
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return &models.User{
-			Id:   primitive.NewObjectID(),
-			Name: claims["test"].(string),
-		}, nil
+		return claims["id"].(string), nil
 	}
 
-	return nil, errors.New("invalid token")
+	return "", errors.New("invalid token")
 }
 
 func extractToken(c *gin.Context) (string, error) {
@@ -96,7 +92,7 @@ func LoginHandle(c *gin.Context) {
 	}
 
 	var user models.User
-	filter := bson.D{{Key: "name", Value: body.Username}}
+	filter := bson.M{"name": body.Username}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := db.UserCollection.FindOne(ctx, filter).Decode(&user); err != nil {
