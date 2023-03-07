@@ -37,5 +37,10 @@ func NewRouter(handler *gin.Engine) {
 			userRouter.POST("/", api.CreateUserHandle)
 			userRouter.POST("/register", api.RegisterHandle)
 		}
+
+		eventRouter := apiRouter.Group("/events")
+		{
+			eventRouter.POST("/", api.CreateEventHandler)
+		}
 	}
 }

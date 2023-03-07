@@ -23,18 +23,8 @@ func ProfileHandle(c *gin.Context) {
 		return
 	}
 
-	userObjectId, err := primitive.ObjectIDFromHex(userId)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "error",
-		})
-
-		return
-	}
-
 	var user models.User
-	filter := bson.M{"id": userObjectId}
+	filter := bson.M{"id": userId}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := db.UserCollection.FindOne(ctx, filter).Decode(&user); err != nil {

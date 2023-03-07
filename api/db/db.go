@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"time"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -16,7 +17,7 @@ func ConnectDB() *mongo.Client {
 
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	err = client.Connect(ctx)
 
@@ -35,8 +36,9 @@ func ConnectDB() *mongo.Client {
 var DB *mongo.Client = ConnectDB()
 
 func GetCollection(collectionName string) *mongo.Collection {
-    collection := DB.Database(DB_NAME).Collection(collectionName)
-    return collection
+	collection := DB.Database(DB_NAME).Collection(collectionName)
+	return collection
 }
 
 var UserCollection *mongo.Collection = GetCollection("users")
+var EventsCollection *mongo.Collection = GetCollection("events")
