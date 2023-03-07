@@ -3,9 +3,11 @@ package models
 import (
 	"context"
 	"errors"
+	"log"
 	"networking-events-api/db"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -32,4 +34,28 @@ func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
 	}
 
 	return nil, errors.New("invalid id")
+}
+
+func GetEvents() ([]Event, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+
+	defer cancel()
+
+	cursor, err := db.EventsCollection.Find(ctx, bson.D{})
+	if err != nil {
+		return nil, err
+	}
+
+	var results []Event
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+
+	defer cancel()
+
+	if err := cursor.All(ctx, &results); err != nil {
+		log.Fatal(err)
+
+		return nil, err
+	}
+
+	return results, nil
 }

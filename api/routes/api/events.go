@@ -60,3 +60,19 @@ func CreateEventHandler(c *gin.Context) {
 		"id":      id,
 	})
 }
+
+func ListEventsHandler(c *gin.Context) {
+	events, err := models.GetEvents()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"events": events,
+	})
+}
