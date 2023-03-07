@@ -8,7 +8,7 @@ const initialState: AuthState = { accessToken: null };
 
 const authSlice = createSlice({ name: 'auth', initialState, reducers: {
     setToken(state, action) {
-        state.accessToken = action.payload.jwt;
+        state.accessToken = action.payload.token;
     },
 
     logout(state) {

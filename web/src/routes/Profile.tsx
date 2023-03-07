@@ -15,7 +15,7 @@ export const Profile = () => {
         <h1>Profile</h1>
         <ul>
             <li>Username: {profile?.username}</li>
-            <li>Id: { profile?._id }</li>
+            <li>Id: { profile?.id }</li>
         </ul>
 
     </>
