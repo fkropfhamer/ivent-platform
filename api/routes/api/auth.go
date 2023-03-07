@@ -1,25 +1,29 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"networking-events-api/db"
 	"networking-events-api/models"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const secret = "1234"
 
-func createJWT() string {
+func createJWT(user *models.User) string {
 	claims := jwt.MapClaims{
-		"test": "123",
-		"iat":  time.Now().Unix(),
+		"id":  user.Id,
+		"iat": time.Now().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -75,8 +79,43 @@ func extractToken(c *gin.Context) (string, error) {
 	return "", errors.New("no token")
 }
 
+type loginRequestBody struct {
+	Username string
+	Password string
+}
+
 func LoginHandle(c *gin.Context) {
-	token := createJWT()
+	var body loginRequestBody
+
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid body",
+		})
+
+		return
+	}
+
+	var user models.User
+	filter := bson.D{{Key: "name", Value: body.Username}}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := db.UserCollection.FindOne(ctx, filter).Decode(&user); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "bad username or password",
+		})
+
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "bad username or password",
+		})
+
+		return
+	}
+
+	token := createJWT(&user)
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
