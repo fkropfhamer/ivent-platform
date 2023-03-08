@@ -22,7 +22,7 @@ const secret = "1234"
 
 func createJWT(user *models.User) string {
 	claims := jwt.MapClaims{
-		"id":  user.Id,
+		"id":  user.Id.Hex(),
 		"iat": time.Now().Unix(),
 	}
 

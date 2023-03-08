@@ -12,7 +12,7 @@ func main() {
 	r.GET("/ping", routes.Handle)
 
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowHeaders = []string{"authorization"}
+	corsConfig.AllowHeaders = []string{"authorization", "content-type"}
 	corsConfig.AllowAllOrigins = true
 	r.Use(cors.New(corsConfig))
 
