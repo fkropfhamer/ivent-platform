@@ -46,7 +46,7 @@ func GetEvents() ([]Event, error) {
 		return nil, err
 	}
 
-	var results []Event
+	results := []Event{}
 	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 
 	defer cancel()
