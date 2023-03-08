@@ -9,5 +9,8 @@ export const Events = () => {
 
     console.log(data)
 
-    return <>{data.map(event => <div key={event.id}>{event.name}</div>)}</>
+    return <>
+        <h1>Events</h1>
+        {data.map(event => <div key={event.id}>{event.name}</div>)}
+    </>
 }

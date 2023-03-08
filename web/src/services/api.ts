@@ -27,6 +27,7 @@ export const apiSlice = createApi({
     endpoints(builder) {
         return {
             login: builder.mutation({ query: (credentials) => ({ url: 'auth/login', method: 'POST', body: credentials }) }),
+            event: builder.query<Event, string>({ query: (id) => `events/${id}`}),
             fetchEvents: builder.query<[Event], void>({ query: () => 'events', transformResponse: (response: { events: [Event]}) => response.events }),
             registerUser: builder.mutation({ query: (credentials) => ({ url: 'users/register', method: 'POST', body: credentials }) }),
             profile: builder.query<Profile, void>({ query: () => 'users/profile'}),
@@ -35,4 +36,4 @@ export const apiSlice = createApi({
 });
 
 
-export const { useLoginMutation,  useFetchEventsQuery, useRegisterUserMutation, useProfileQuery } = apiSlice;
+export const { useLoginMutation,  useFetchEventsQuery, useRegisterUserMutation, useProfileQuery, useEventQuery } = apiSlice;
