@@ -41,6 +41,7 @@ func NewRouter(handler *gin.Engine) {
 		eventRouter := apiRouter.Group("/events")
 		{
 			eventRouter.POST("", api.CreateEventHandler)
+			eventRouter.GET("/:id", api.GetEventHandler)
 			eventRouter.GET("", api.ListEventsHandler)
 		}
 	}

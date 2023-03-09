@@ -59,3 +59,22 @@ func GetEvents() ([]Event, error) {
 
 	return results, nil
 }
+
+func GetEvent(id string) (*Event, error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, errors.New("bad id")
+	}
+
+	var event Event
+
+	filter := bson.M{"_id": objectID}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := db.EventsCollection.FindOne(ctx, filter).Decode(&event); err != nil {
+
+		return nil, errors.New("event not found")
+	}
+
+	return &event, nil
+}
