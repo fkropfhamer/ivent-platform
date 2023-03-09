@@ -2,7 +2,7 @@
 ## getting started
 ### api
 - `cd api`
-- `docker-compose up -d`
+- `docker compose up -d`
 - `go run .`
 - api available at http://localhost:8080
 ### web
