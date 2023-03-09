@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useFetchEventsQuery } from "../services/api";
 
 export const Events = () => {
@@ -11,6 +12,6 @@ export const Events = () => {
 
     return <>
         <h1>Events</h1>
-        {data.map(event => <div key={event.id}>{event.name}</div>)}
+        {data.map(event => <div key={event.id}><Link to={event.id}>{event.name}</Link></div>)}
     </>
 }
