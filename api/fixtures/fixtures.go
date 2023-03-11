@@ -9,7 +9,7 @@ import (
 )
 
 func createExampleEvents(testUser *models.User) {
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 50; i++ {
 		event := models.Event{
 			ID:      primitive.NewObjectID(),
 			Name:    "event" + strconv.Itoa(i),
