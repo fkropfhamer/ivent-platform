@@ -93,3 +93,19 @@ func GetEvent(id string) (*Event, error) {
 
 	return &event, nil
 }
+
+func DeleteEvent(id string) error {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("bad id")
+	}
+
+	filter := bson.M{"_id": objectID}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if _, err := db.EventsCollection.DeleteOne(ctx, filter); err != nil {
+		return err
+	}
+
+	return nil
+}

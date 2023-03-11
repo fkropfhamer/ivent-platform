@@ -101,3 +101,19 @@ func GetEventHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, event)
 }
+
+func DeleteEventHandler(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := models.DeleteEvent(id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "event deleted",
+	})
+}
