@@ -34,7 +34,7 @@ func CreateEventHandler(c *gin.Context) {
 
 	if body.Name == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "name can not be emptry",
+			"message": "name can not be empty",
 		})
 
 		return

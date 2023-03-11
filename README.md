@@ -8,4 +8,4 @@
 ### web
 - `cd web`
 - `npm run dev`
-- available at http://locahost:5173
+- available at http://localhost:5173
