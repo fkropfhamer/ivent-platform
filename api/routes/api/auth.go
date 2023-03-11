@@ -20,6 +20,7 @@ import (
 
 const secret = "1234"
 const refreshLifetime = 60 * 10
+const tokenLifetime = 60 * 5
 
 func createJWT(userID *primitive.ObjectID) string {
 	claims := jwt.MapClaims{
@@ -59,6 +60,12 @@ func Authenticate(c *gin.Context) (*primitive.ObjectID, error) {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		iat := int64(claims["iat"].(float64)) // I don't know why it is a float but ok.
+
+		if iat+tokenLifetime < time.Now().Unix() {
+			return nil, errors.New("token expired")
+		}
+
 		userId := claims["id"].(string)
 
 		userObjectId, err := primitive.ObjectIDFromHex(userId)
