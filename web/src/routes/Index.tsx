@@ -6,7 +6,7 @@ import { RootState } from '../app/store';
 
 
 function Index() {
-  const count = useSelector<RootState>((state) => state.counter.value);
+  const count = useSelector((state: RootState) => state.counter.value);
   const dispatch = useDispatch();
 
   const { data = [], isFetching } = useFetchEventsQuery();

@@ -1,6 +1,6 @@
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 import { RootState } from '../app/store';
-import { logout, setToken } from '../features/auth/auth-slice';
+import { logout, setRefreshToken, setToken } from '../features/auth/auth-slice';
 
 interface Profile {
     username: string,
@@ -31,18 +31,19 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 
     const state = api.getState() as RootState
 
-    if (result.error && result.error.status === 401 && state.auth.refreshToken) {
-        const refreshResult = await baseQuery({ url: 'auth/refresh', headers: { refresh: state.auth.refreshToken } }, api, extraOptions)
+    if (result.error && result.error.status === 401) {
+        if (state.auth.refreshToken) {
+            const refreshResult = await baseQuery({ url: 'auth/refresh', headers: { refresh: state.auth.refreshToken } }, api, extraOptions)
+            if (refreshResult.data) {
+                const { token } = refreshResult.data as { token: string }
+                api.dispatch(setToken(token))
 
-        if (refreshResult.data) {
-            const { token } = refreshResult.data as { token: string }
-            api.dispatch(setToken(token))
-
-            result = await baseQuery(args, api, extraOptions)
-        } else {
-            api.dispatch(logout())
-            window.location.href = '/login'
+                return baseQuery(args, api, extraOptions)
+            }
         }
+
+        api.dispatch(logout())
+        window.location.href = '/login'  
     }
 
 

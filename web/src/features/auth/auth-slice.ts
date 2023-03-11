@@ -5,7 +5,9 @@ interface AuthState {
     refreshToken: string | null
 }
 
-const initialState: AuthState = { accessToken: null, refreshToken: window.localStorage.getItem("refresh-token") };
+const refreshToken = window.localStorage.getItem("refresh-token") ? window.localStorage.getItem("refresh-token") : null
+
+const initialState: AuthState = { accessToken: null, refreshToken };
 
 const authSlice = createSlice({ name: 'auth', initialState, reducers: {
     setToken(state, action: PayloadAction<string>) {
@@ -13,13 +15,14 @@ const authSlice = createSlice({ name: 'auth', initialState, reducers: {
     },
 
     setRefreshToken(state, action: PayloadAction<string>) {
-        window.localStorage.setItem("refresh-token", action.payload)
         state.refreshToken = action.payload
+        window.localStorage.setItem("refresh-token", action.payload)
     },
 
     logout(state) {
         state.accessToken = null
         state.refreshToken = null
+        window.localStorage.setItem("refresh-token", "")
     }
 }});
 
