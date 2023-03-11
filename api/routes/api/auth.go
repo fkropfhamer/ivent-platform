@@ -121,8 +121,18 @@ func LoginHandle(c *gin.Context) {
 	}
 
 	token := createJWT(&user)
+	refreshToken, err := models.CreateRefreshToken()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"messsage": "something went wrong",
+		})
+
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+		"token":         token,
+		"refresh-token": refreshToken,
 	})
 }
