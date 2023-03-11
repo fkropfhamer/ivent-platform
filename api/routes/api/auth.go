@@ -18,7 +18,7 @@ import (
 )
 
 const secret = "1234"
-const refreshLifetime = 60 * 10
+const refreshLifetime = 60
 const tokenLifetime = 60 * 5
 
 func createJWT(userID *primitive.ObjectID) string {
