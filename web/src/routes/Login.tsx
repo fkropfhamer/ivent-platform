@@ -47,7 +47,7 @@ export const Login = () => {
             <button
                 onClick={onFormSubmit}>Submit</button>
             <p>
-                Don't have an account? <a href="/register">Sign up</a>
+                Don't have an account? <a href="/register">Register</a>
             </p>
         </div>
         </body>
