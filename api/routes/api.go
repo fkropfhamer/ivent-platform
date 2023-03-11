@@ -7,14 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func A(m string) func(c *gin.Context) {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": m,
-		})
-	}
-}
-
 func Handle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
@@ -24,8 +16,6 @@ func Handle(c *gin.Context) {
 func NewRouter(handler *gin.Engine) {
 	apiRouter := handler.Group("/api")
 	{
-		apiRouter.GET("/test", A("test"))
-
 		authRouter := apiRouter.Group("/auth")
 		{
 			authRouter.POST("/login", api.LoginHandle)
