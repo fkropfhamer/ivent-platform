@@ -3,13 +3,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { incremented } from '../features/counter/counter-slice';
 import { useFetchEventsQuery } from '../services/api';
 import { Link } from 'react-router-dom';
+import { RootState } from '../app/store';
 
 
 function Index() {
-  const count = useSelector((state) => state.counter.value);
+  const count = useSelector<RootState>((state) => state.counter.value);
   const dispatch = useDispatch();
 
   const { data = [], isFetching } = useFetchEventsQuery();
+
+  console.log(data)
 
   return (
     <div className="App">

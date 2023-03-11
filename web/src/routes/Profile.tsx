@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useProfileQuery } from "../services/api"
 
 export const Profile = () => {
@@ -15,8 +16,8 @@ export const Profile = () => {
         <h1>Profile</h1>
         <ul>
             <li>Username: {profile?.username}</li>
-            <li>Id: { profile?._id }</li>
+            <li>Id: { profile?.id }</li>
         </ul>
-
+        <Link to="/events/create">create Event</Link>
     </>
 }
