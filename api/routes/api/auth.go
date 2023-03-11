@@ -19,10 +19,11 @@ import (
 )
 
 const secret = "1234"
+const refreshLifetime = 60 * 10
 
-func createJWT(user *models.User) string {
+func createJWT(userID *primitive.ObjectID) string {
 	claims := jwt.MapClaims{
-		"id":  user.Id.Hex(),
+		"id":  userID.Hex(),
 		"iat": time.Now().Unix(),
 	}
 
@@ -120,8 +121,8 @@ func LoginHandle(c *gin.Context) {
 		return
 	}
 
-	token := createJWT(&user)
-	refreshToken, err := models.CreateRefreshToken()
+	token := createJWT(&user.Id)
+	refreshToken, err := models.CreateRefreshToken(&user.Id)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -134,5 +135,44 @@ func LoginHandle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token":         token,
 		"refresh-token": refreshToken,
+	})
+}
+
+func RefreshHandle(c *gin.Context) {
+	refreshToken := c.Request.Header.Get("Refresh")
+
+	if refreshToken == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "refresh header not present",
+		})
+
+		return
+	}
+
+	dbToken, err := models.GetRefreshToken(refreshToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "token does not exist",
+		})
+
+		log.Fatal(err)
+
+		return
+	}
+
+	if dbToken.IAT+refreshLifetime < time.Now().Unix() {
+		models.DeleteRefreshToken(dbToken.ID)
+
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "token expired",
+		})
+
+		return
+	}
+
+	token := createJWT(&dbToken.User)
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
 	})
 }

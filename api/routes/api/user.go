@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"networking-events-api/db"
 	"networking-events-api/models"
@@ -31,6 +32,8 @@ func ProfileHandle(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "error",
 		})
+
+		log.Fatal(err, userId)
 
 		return
 	}
