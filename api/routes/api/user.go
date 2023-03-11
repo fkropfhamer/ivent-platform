@@ -16,7 +16,7 @@ func ProfileHandle(c *gin.Context) {
 	userId, err := Authenticate(c)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
 		})
 

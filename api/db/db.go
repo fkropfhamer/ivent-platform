@@ -42,3 +42,4 @@ func GetCollection(collectionName string) *mongo.Collection {
 
 var UserCollection *mongo.Collection = GetCollection("users")
 var EventsCollection *mongo.Collection = GetCollection("events")
+var RefreshTokenCollection *mongo.Collection = GetCollection("refreshToken")

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"networking-events-api/db"
 	"networking-events-api/models"
@@ -19,10 +18,12 @@ import (
 )
 
 const secret = "1234"
+const refreshLifetime = 60 * 10
+const tokenLifetime = 60 * 5
 
-func createJWT(user *models.User) string {
+func createJWT(userID *primitive.ObjectID) string {
 	claims := jwt.MapClaims{
-		"id":  user.Id.Hex(),
+		"id":  userID.Hex(),
 		"iat": time.Now().Unix(),
 	}
 
@@ -30,8 +31,6 @@ func createJWT(user *models.User) string {
 	tokenString, err := token.SignedString([]byte(secret))
 
 	if err != nil {
-		log.Fatal(err)
-
 		return ""
 	}
 
@@ -58,6 +57,12 @@ func Authenticate(c *gin.Context) (*primitive.ObjectID, error) {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		iat := int64(claims["iat"].(float64)) // I don't know why it is a float but ok.
+
+		if iat+tokenLifetime < time.Now().Unix() {
+			return nil, errors.New("token expired")
+		}
+
 		userId := claims["id"].(string)
 
 		userObjectId, err := primitive.ObjectIDFromHex(userId)
@@ -120,7 +125,54 @@ func LoginHandle(c *gin.Context) {
 		return
 	}
 
-	token := createJWT(&user)
+	token := createJWT(&user.Id)
+	refreshToken, err := models.CreateRefreshToken(&user.Id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"messsage": "something went wrong",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token":         token,
+		"refresh-token": refreshToken,
+	})
+}
+
+func RefreshHandle(c *gin.Context) {
+	refreshToken := c.Request.Header.Get("Refresh")
+
+	if refreshToken == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "refresh header not present",
+		})
+
+		return
+	}
+
+	dbToken, err := models.GetRefreshToken(refreshToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "token does not exist",
+		})
+
+		return
+	}
+
+	if dbToken.IAT+refreshLifetime < time.Now().Unix() {
+		models.DeleteRefreshToken(dbToken.ID)
+
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "token expired",
+		})
+
+		return
+	}
+
+	token := createJWT(&dbToken.User)
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,

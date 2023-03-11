@@ -29,6 +29,7 @@ func NewRouter(handler *gin.Engine) {
 		authRouter := apiRouter.Group("/auth")
 		{
 			authRouter.POST("/login", api.LoginHandle)
+			authRouter.GET("/refresh", api.RefreshHandle)
 		}
 
 		userRouter := apiRouter.Group("/users")
