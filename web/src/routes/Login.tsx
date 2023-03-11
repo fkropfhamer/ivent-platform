@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom"
-import { setToken } from "../features/auth/auth-slice";
+import { setRefreshToken, setToken } from "../features/auth/auth-slice";
 import { useLoginMutation } from "../services/api";
 
 
@@ -18,10 +18,11 @@ export const Login = () => {
     });
 
     const onFormSubmit = async () => {
-        const token = await login(formState).unwrap();
-        dispatch(setToken(token))
+        const tokens = await login(formState).unwrap();
+        dispatch(setToken(tokens.token))
+        dispatch(setRefreshToken(tokens["refresh-token"]))
 
-        console.log(token);
+        console.log(tokens);
         
         navigate("/profile")
     }
