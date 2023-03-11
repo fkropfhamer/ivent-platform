@@ -9,18 +9,16 @@ import (
 )
 
 type RefreshToken struct {
-	ID    primitive.ObjectID
-	token string
-	iat   int64
+	ID  primitive.ObjectID
+	iat int64
 }
 
 func createRefreshToken() (string, error) {
-	token := ""
+	token := primitive.NewObjectID()
 
 	tokenObject := RefreshToken{
-		ID:    primitive.NewObjectID(),
-		token: token,
-		iat:   time.Now().Unix(),
+		ID:  token,
+		iat: time.Now().Unix(),
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -32,5 +30,5 @@ func createRefreshToken() (string, error) {
 		return "", err
 	}
 
-	return token, nil
+	return token.Hex(), nil
 }
