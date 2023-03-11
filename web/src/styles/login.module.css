@@ -1,0 +1,74 @@
+/* CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+}
+
+/* Login Box Styles */
+.login-box {
+    width: 400px;
+    background-color: #fff;
+    border-radius: 5px;
+    margin: 50px auto;
+    padding: 30px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.login-box h1 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 30px;
+}
+
+.login-box label {
+    display: block;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.login-box input[type="text"],
+.login-box input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 20px;
+}
+
+.login-box button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.login-box button:hover {
+    background-color: #3e8e41;
+}
+
+.login-box p {
+    font-size: 16px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-box p a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.login-box p a:hover {
+    text-decoration: underline;
+}
