@@ -8,8 +8,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var DB_STRING = "mongodb://localhost:27017"
-var DB_NAME = "events"
+const DB_STRING = "mongodb://localhost:27017"
+const DB_NAME = "events"
 
 func ConnectDB() *mongo.Client {
 	client, err := mongo.NewClient(options.Client().ApplyURI(DB_STRING))
@@ -33,10 +33,10 @@ func ConnectDB() *mongo.Client {
 	return client
 }
 
-var DB *mongo.Client = ConnectDB()
+var DB *mongo.Database = ConnectDB().Database(DB_NAME)
 
 func GetCollection(collectionName string) *mongo.Collection {
-	collection := DB.Database(DB_NAME).Collection(collectionName)
+	collection := DB.Collection(collectionName)
 	return collection
 }
 

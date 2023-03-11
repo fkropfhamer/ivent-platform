@@ -5,6 +5,7 @@
 - `docker compose up -d`
 - `go run .`
 - api available at http://localhost:8080
+- load fixtures `go run fixtures.go`
 ### web
 - `cd web`
 - `npm run dev`
