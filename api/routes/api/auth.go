@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"networking-events-api/db"
 	"networking-events-api/models"
@@ -32,8 +31,6 @@ func createJWT(userID *primitive.ObjectID) string {
 	tokenString, err := token.SignedString([]byte(secret))
 
 	if err != nil {
-		log.Fatal(err)
-
 		return ""
 	}
 
@@ -161,8 +158,6 @@ func RefreshHandle(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "token does not exist",
 		})
-
-		log.Fatal(err)
 
 		return
 	}
