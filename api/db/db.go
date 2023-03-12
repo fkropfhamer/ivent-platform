@@ -2,17 +2,28 @@ package db
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const DB_STRING = "mongodb://localhost:27017"
+func getDbUrl() string {
+	DbEnv := os.Getenv("DB_URL")
+	if DbEnv == "" {
+		return "mongodb://localhost:27017"
+	}
+
+	return DbEnv
+}
+
+var dbUrl = getDbUrl()
+
 const DB_NAME = "events"
 
 func ConnectDB() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI(DB_STRING))
+	client, err := mongo.NewClient(options.Client().ApplyURI(dbUrl))
 	if err != nil {
 
 	}
