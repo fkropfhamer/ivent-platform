@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  mongodb:
+    restart: unless-stopped
+    image: mongo
+
+
+  api:
+    restart: unless-stopped
+    build:
+      context: .
+      target: app_api
+    ports:
+      - target: 8080
+        published: 8080
+    environment:
+        DB_URL: mongodb://mongodb:27017
+    depends_on:
+      - mongodb
+
+  caddy:
+    restart: unless-stopped
+    build:
+      context: .
+      target: app_caddy
+    depends_on:
+      - api
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+      - target: 443
+        published: 443
+    environment:
+      SERVER_NAME: localhost
