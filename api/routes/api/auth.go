@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"networking-events-api/config"
 	"networking-events-api/db"
 	"networking-events-api/models"
 	"strings"
@@ -17,10 +18,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-const secret = "1234"
-const refreshLifetime = 60 * 10
-const tokenLifetime = 60 * 5
-
 func createJWT(userID *primitive.ObjectID) string {
 	claims := jwt.MapClaims{
 		"id":  userID.Hex(),
@@ -28,7 +25,7 @@ func createJWT(userID *primitive.ObjectID) string {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(secret))
+	tokenString, err := token.SignedString([]byte(config.Secret))
 
 	if err != nil {
 		return ""
@@ -49,7 +46,7 @@ func Authenticate(c *gin.Context) (*primitive.ObjectID, error) {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(secret), nil
+		return []byte(config.Secret), nil
 	})
 
 	if err != nil {
@@ -59,7 +56,7 @@ func Authenticate(c *gin.Context) (*primitive.ObjectID, error) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		iat := int64(claims["iat"].(float64)) // I don't know why it is a float but ok.
 
-		if iat+tokenLifetime < time.Now().Unix() {
+		if iat+config.TokenLifetime < time.Now().Unix() {
 			return nil, errors.New("token expired")
 		}
 
@@ -162,7 +159,7 @@ func RefreshHandle(c *gin.Context) {
 		return
 	}
 
-	if dbToken.IAT+refreshLifetime < time.Now().Unix() {
+	if dbToken.IAT+config.RefreshLifetime < time.Now().Unix() {
 		models.DeleteRefreshToken(dbToken.ID)
 
 		c.JSON(http.StatusUnauthorized, gin.H{

@@ -1,0 +1,63 @@
+version: '3.7'
+
+services:
+  mongodb:
+    restart: unless-stopped
+    image: mongo
+    volumes:
+      - type: volume
+        source: db-data
+        target: /data/db
+      - type: volume
+        source: db-log
+        target: /var/log/mongodb
+      - ./docker/mongodb/mongodb-init.sh:/docker-entrypoint-initdb.d/mongodb-init.sh:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:-example}
+      MONGODB_USER_USERNAME: ${MONGODB_USER_USERNAME:-user}
+      MONGODB_USER_PASSWORD: ${MONGODB_USER_PASSWORD:-1234}
+      MONGODB_DATABASE_NAME: ${MONGODB_DATABASE_NAME:-events}
+    ports:
+      - "27017:27017"
+
+  api:
+    restart: unless-stopped
+    build:
+      context: .
+      target: app_api
+    environment:
+        DB_URL: mongodb://${MONGODB_USER_USERNAME:-user}:${MONGODB_USER_PASSWORD:-1234}@mongodb:27017/${MONGODB_DATABASE_NAME:-events}
+        DB_NAME: ${MONGODB_DATABASE_NAME:-events}
+        SECRET: ${SECRET:-1234}
+    depends_on:
+      - mongodb
+
+  caddy:
+    restart: unless-stopped
+    build:
+      context: .
+      target: app_caddy
+    depends_on:
+      - api
+    volumes:
+      - type: volume
+        source: caddy_data
+        target: /data
+      - type: volume
+        source: caddy_config
+        target: /config
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+      - target: 443
+        published: 443
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost}
+
+volumes:
+  db-data:
+  db-log:
+  caddy_data:
+  caddy_config:

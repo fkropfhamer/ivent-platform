@@ -1,0 +1,17 @@
+{
+    # Debug
+    {$CADDY_DEBUG}
+}
+
+{$SERVER_NAME}
+
+{$CADDY_EXTRA_CONFIG}
+
+log
+
+route {
+    root * /srv/app/public
+    reverse_proxy /api/* http://api:8080
+    encode zstd gzip
+    file_server
+}
