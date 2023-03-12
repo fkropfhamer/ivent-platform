@@ -11,9 +11,6 @@ services:
     build:
       context: .
       target: app_api
-    ports:
-      - target: 8080
-        published: 8080
     environment:
         DB_URL: mongodb://mongodb:27017
     depends_on:
@@ -33,4 +30,4 @@ services:
       - target: 443
         published: 443
     environment:
-      SERVER_NAME: localhost
+      SERVER_NAME: ${SERVER_NAME:-localhost}
