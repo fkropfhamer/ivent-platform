@@ -12,8 +12,8 @@ func getEnv(key string, defaultValue string) string {
 }
 
 var DbUrl = getEnv("DB_URL", "mongodb://localhost:27017")
+var DbName = getEnv("DB_NAME", "events")
 var Secret = getEnv("SECRET", "1234")
 
 const RefreshLifetime = 60 * 10
 const TokenLifetime = 60 * 5
-const DbName = "events"
