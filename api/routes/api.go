@@ -33,6 +33,7 @@ func NewRouter(handler *gin.Engine) {
 		{
 			eventRouter.POST("", api.CreateEventHandler)
 			eventRouter.GET("/:id", api.GetEventHandler)
+			eventRouter.DELETE("/:id", api.DeleteEventHandler)
 			eventRouter.GET("", api.ListEventsHandler)
 		}
 	}
