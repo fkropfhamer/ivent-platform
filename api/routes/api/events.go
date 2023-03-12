@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"networking-events-api/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -62,7 +63,13 @@ func CreateEventHandler(c *gin.Context) {
 }
 
 func ListEventsHandler(c *gin.Context) {
-	events, err := models.GetEvents()
+	pageParam := c.Query("page")
+	page, err := strconv.ParseInt(pageParam, 10, 64)
+	if err != nil {
+		page = 0
+	}
+
+	events, count, err := models.GetEvents(page)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -74,6 +81,8 @@ func ListEventsHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"events": events,
+		"count":  count,
+		"page":   page,
 	})
 }
 
@@ -91,4 +100,20 @@ func GetEventHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, event)
+}
+
+func DeleteEventHandler(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := models.DeleteEvent(id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "event deleted",
+	})
 }

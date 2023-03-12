@@ -7,7 +7,7 @@ interface Profile {
     id: string,
 }
 
-interface Event {
+export interface Event {
     name: string,
     id: string
 }
@@ -58,7 +58,7 @@ export const apiSlice = createApi({
             login: builder.mutation<{ token: string, "refresh-token": string }, { username: string, password: string }>({ query: (credentials) => ({ url: 'auth/login', method: 'POST', body: credentials }) }),
             event: builder.query<Event, string>({ query: (id) => `events/${id}` }),
             createEvent: builder.mutation({ query: (event) => ({ url: 'events', method: 'POST', body: event }) }),
-            fetchEvents: builder.query<[Event], void>({ query: () => 'events', transformResponse: (response: { events: [Event] }) => response.events }),
+            fetchEvents: builder.query<{events: [Event], page: number, count: number }, number>({ query: (page) => `events?page=${page}` }),
             registerUser: builder.mutation({ query: (credentials) => ({ url: 'users/register', method: 'POST', body: credentials }) }),
             profile: builder.query<Profile, void>({ query: () => 'users/profile' }),
         }

@@ -1,14 +1,15 @@
 package main
 
 import (
+	"context"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"networking-events-api/db"
 	"networking-events-api/models"
 	"strconv"
 )
 
-func CreateExampleEvents(testUser *models.User) {
-
-	for i := 0; i < 10; i++ {
+func createExampleEvents(testUser *models.User) {
+	for i := 0; i < 50; i++ {
 		event := models.Event{
 			ID:      primitive.NewObjectID(),
 			Name:    "event" + strconv.Itoa(i),
@@ -23,7 +24,7 @@ func CreateExampleEvents(testUser *models.User) {
 
 }
 
-func CreateTestUser() *models.User {
+func createTestUser() *models.User {
 	testUser := models.User{
 		Id:       primitive.NewObjectID(),
 		Name:     "TestUser",
@@ -39,22 +40,12 @@ func CreateTestUser() *models.User {
 	return &testUser
 }
 
-func PopulateDb() {
+func loadFixtures() {
+	db.DB.Drop(context.Background())
+	testUser := createTestUser()
+	createExampleEvents(testUser)
+}
 
-	if events, err := models.GetEvents(); len(events) >= 10 {
-		if err != nil {
-			return
-		}
-
-		return
-	}
-
-	testUser := CreateTestUser()
-
-	if testUser == nil {
-		return
-	}
-
-	CreateExampleEvents(testUser)
-
+func main() {
+	loadFixtures()
 }

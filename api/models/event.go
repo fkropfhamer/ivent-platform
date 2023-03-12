@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"errors"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"networking-events-api/db"
 	"time"
@@ -36,28 +37,42 @@ func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
 	return nil, errors.New("invalid id")
 }
 
-func GetEvents() ([]Event, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func GetEvents(page int64) ([]Event, int64, error) {
+	pageLimit := int64(15)
+	skip := page * pageLimit
+	filter := bson.D{}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	count, err := db.EventsCollection.CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cursor, err := db.EventsCollection.Find(ctx, bson.D{})
+	opts := options.FindOptions{
+		Skip:  &skip,
+		Limit: &pageLimit,
+	}
+
+	cursor, err := db.EventsCollection.Find(ctx, filter, &opts)
 	if err != nil {
-		return nil, err
+		return nil, count, err
 	}
 
 	results := []Event{}
 	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
-
 	defer cancel()
 
 	if err := cursor.All(ctx, &results); err != nil {
 		log.Fatal(err)
 
-		return nil, err
+		return nil, count, err
 	}
 
-	return results, nil
+	return results, count, nil
 }
 
 func GetEvent(id string) (*Event, error) {
@@ -77,4 +92,20 @@ func GetEvent(id string) (*Event, error) {
 	}
 
 	return &event, nil
+}
+
+func DeleteEvent(id string) error {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("bad id")
+	}
+
+	filter := bson.M{"_id": objectID}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if _, err := db.EventsCollection.DeleteOne(ctx, filter); err != nil {
+		return err
+	}
+
+	return nil
 }
