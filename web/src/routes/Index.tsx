@@ -9,7 +9,7 @@ function Index() {
   const count = useSelector((state: RootState) => state.counter.value);
   const dispatch = useDispatch();
 
-  const { data = [], isFetching } = useFetchEventsQuery();
+  const { data = { count: 0 }, isFetching } = useFetchEventsQuery(0);
 
   console.log(data)
 
@@ -21,7 +21,7 @@ function Index() {
           count is {count}
         </button>
         <p>
-          {isFetching ? "loading" : `Number of events fetched ${data.length}`} 
+          {isFetching ? "loading" : `Number of events fetched ${data.count}`}
         </p>
         <Link to="/register">register</Link>
         <Link to="/login">login</Link>
