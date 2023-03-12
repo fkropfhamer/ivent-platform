@@ -1,0 +1,16 @@
+{
+    # Debug
+    {$CADDY_DEBUG}
+}
+
+{$SERVER_NAME}
+
+{$CADDY_EXTRA_CONFIG}
+
+log
+
+route {
+    root * /srv/app/public
+    encode zstd gzip
+    file_server
+}
