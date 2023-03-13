@@ -23,7 +23,7 @@ export const Login = () => {
 
         console.log(tokens);
 
-        navigate("/profile");
+        navigate("/events");
     };
 
     return (

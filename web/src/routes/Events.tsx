@@ -27,9 +27,24 @@ export const Events = () => {
         return <div>Loading</div>
     }
 
-    return <>
-        <h1>Events</h1>
-        {events.map(event => <div key={event.id}><Link to={event.id}>{event.name}</Link></div>)}
-        {showMore ? <button onClick={() => setPage(page + 1)}>more</button> : null}
-    </>
+    return (
+        <div className="w-96 bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
+            <h1 className="text-3xl text-center font-bold mb-6">Events</h1>
+            {events.map(event => (
+                <div key={event.id}>
+                    <Link to={event.id} className="text-green-500 hover:underline">
+                        {event.name}
+                    </Link>
+                </div>
+            ))}
+            {showMore ? (
+                <button
+                    className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-6"
+                    onClick={() => setPage(page + 1)}
+                >
+                    more
+                </button>
+            ) : null}
+        </div>
+    );
 }
