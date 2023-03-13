@@ -127,3 +127,34 @@ func RegisterHandle(c *gin.Context) {
 		"message": "user registered",
 	})
 }
+
+func DeleteAccountHandle(c *gin.Context) {
+	id, err := Authenticate(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	if err := models.DeleteUser(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	if err := models.DeleteAllRefreshTokenForUser(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error2",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "acc deleted",
+	})
+}
