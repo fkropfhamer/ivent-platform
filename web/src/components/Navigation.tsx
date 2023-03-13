@@ -13,14 +13,35 @@ export const Navigation = () => {
         navigate("/login")
     }
 
-    if (isLoggedIn) {
-        return <>
-            <Link to='/profile'>Profile</Link>
-            <button onClick={logoutAction}>Logout</button>
-        </>
-    }
-
-    return <>
-        <Link to='/login'></Link>
-    </>
+    return (
+        <nav className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+                <Link to="/" className="text-xl font-bold">
+                    IVENT-Plattform
+                </Link>
+            </div>
+            <div className="flex items-center">
+                {isLoggedIn ? (
+                    <>
+                        <Link to="/profile" className="mr-4">
+                            Profile
+                        </Link>
+                        <button
+                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                            onClick={logoutAction}
+                        >
+                            Logout
+                        </button>
+                    </>
+                ) : (
+                    <Link
+                        to="/login"
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                    >
+                        Login
+                    </Link>
+                )}
+            </div>
+        </nav>
+    );
 }
