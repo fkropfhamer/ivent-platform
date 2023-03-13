@@ -148,7 +148,7 @@ func DeleteAccountHandle(c *gin.Context) {
 
 	if err := models.DeleteAllRefreshTokenForUser(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "error2",
+			"message": "error",
 		})
 
 		return
@@ -156,5 +156,51 @@ func DeleteAccountHandle(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "acc deleted",
+	})
+}
+
+type ChangePasswordRequestBody struct {
+	CurrentPassword string
+	NewPassword     string
+}
+
+func ChangePasswordHandle(c *gin.Context) {
+	id, err := Authenticate(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	var body ChangePasswordRequestBody
+
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid body",
+		})
+
+		return
+	}
+
+	if err := CheckPassword(id, body.CurrentPassword); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid password",
+		})
+
+		return
+	}
+
+	if err := models.UpdatePassword(id, body.NewPassword); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "password updated",
 	})
 }
