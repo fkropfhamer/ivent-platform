@@ -1,5 +1,5 @@
 import {useNavigate} from "react-router-dom";
-import {useChangePasswordMutation, useDeleteAccountMutation} from "../services/api";
+import {useChangePasswordMutation} from "../services/api";
 import {useDispatch} from "react-redux";
 import React, {useState} from "react";
 import {logout} from "../features/auth/auth-slice";
