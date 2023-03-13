@@ -2,17 +2,15 @@ package db
 
 import (
 	"context"
+	"networking-events-api/config"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const DB_STRING = "mongodb://localhost:27017"
-const DB_NAME = "events"
-
 func ConnectDB() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI(DB_STRING))
+	client, err := mongo.NewClient(options.Client().ApplyURI(config.DbUrl))
 	if err != nil {
 
 	}
@@ -33,7 +31,7 @@ func ConnectDB() *mongo.Client {
 	return client
 }
 
-var DB *mongo.Database = ConnectDB().Database(DB_NAME)
+var DB = ConnectDB().Database(config.DbName)
 
 func GetCollection(collectionName string) *mongo.Collection {
 	collection := DB.Collection(collectionName)
