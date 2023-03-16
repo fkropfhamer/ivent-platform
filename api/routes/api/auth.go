@@ -139,6 +139,20 @@ func LoginHandle(c *gin.Context) {
 	})
 }
 
+func CheckPassword(id *primitive.ObjectID, password string) error {
+	var user models.User
+	filter := bson.M{"_id": id}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := db.UserCollection.FindOne(ctx, filter).Decode(&user); err != nil {
+		return err
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+
+	return err
+}
+
 func RefreshHandle(c *gin.Context) {
 	refreshToken := c.Request.Header.Get("Refresh")
 
