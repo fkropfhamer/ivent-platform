@@ -14,19 +14,22 @@ function Index() {
   console.log(data)
 
   return (
-    <div className="App">
-      <h1 className='text-3xl font-bold underline'>Hallo Welt</h1>
-      <div className="card">
-        <button onClick={() => { dispatch(incremented()) }}>
-          count is {count}
-        </button>
-        <p>
-          {isFetching ? "loading" : `Number of events fetched ${data.count}`}
-        </p>
-        <Link to="/register">register</Link>
-        <Link to="/login">login</Link>
+      <div className="w-96 bg-white rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
+        <h1 className="text-3xl text-center font-bold underline mb-6">Welcome to the IVENT-Platform</h1>
+        <div className="card">
+          <button className="bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 px-4 text-lg mb-6" onClick={() => { dispatch(incremented()) }}>
+            Count is {count}
+          </button>
+          <p className="text-lg text-center">
+            {isFetching ? "Loading" : `Number of events fetched: ${data.count}`}
+          </p>
+          <div className="flex justify-center space-x-4 mt-8">
+            <Link to="/register" className="text-green-500 hover:underline">Register</Link>
+            <Link to="/login" className="text-green-500 hover:underline">Login</Link>
+          </div>
+        </div>
       </div>
-    </div>
+
   )
 }
 
