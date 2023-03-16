@@ -44,15 +44,6 @@ func DeleteRefreshToken(id primitive.ObjectID) error {
 	return err
 }
 
-func DeleteAllRefreshTokenForUser(userId *primitive.ObjectID) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	_, err := db.RefreshTokenCollection.DeleteMany(ctx, bson.M{"user": userId})
-
-	return err
-}
-
 func GetRefreshToken(id string) (*RefreshToken, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 
