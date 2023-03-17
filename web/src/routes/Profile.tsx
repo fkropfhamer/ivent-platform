@@ -40,7 +40,7 @@ export const Profile = () => {
                 <Link to="/events/create"> Create Event </Link>
             </div>
             <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-20" >
-                <Link to="/events"> Create Event </Link>
+                <Link to="/events"> GoTo Events </Link>
             </div>
             <div className="mb-6">
                 <h2 className="text-xl font-bold mb-2">Change Password</h2>
