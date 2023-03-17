@@ -24,13 +24,14 @@ export const ChangePasswordForm = () => {
 
     return <form onSubmit={submit}>
         <label>Current Password</label>
-        <input type="password" onChange={(e) =>
+        <input className="ml-2 border rounded-lg" type="password" onChange={(e) =>
             setFormState((prev) => ({...prev, currentPassword: e.target.value}))
         }/>
         <label>New Password</label>
-        <input type="password" onChange={(e) =>
+        <input className="ml-2 border rounded-lg" type="password" onChange={(e) =>
             setFormState((prev) => ({...prev, newPassword: e.target.value}))
         }/>
-        <button type="submit">Change Password</button>
+        <button className="w-full bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 text-lg my-6" type="submit">Change Password</button>
     </form>
+
 }
