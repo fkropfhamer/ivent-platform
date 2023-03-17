@@ -61,9 +61,11 @@ export const apiSlice = createApi({
             fetchEvents: builder.query<{events: [Event], page: number, count: number }, number>({ query: (page) => `events?page=${page}` }),
             registerUser: builder.mutation({ query: (credentials) => ({ url: 'users/register', method: 'POST', body: credentials }) }),
             profile: builder.query<Profile, void>({ query: () => 'users/profile' }),
+            deleteAccount: builder.mutation<void, void>({query: () => ({url: 'users/profile', method: 'DELETE' })}),
+            changePassword: builder.mutation<void, { currentPassword: string, newPassword: string}>({query: (body) => ({ url: 'users/change-password', method: 'POST', body }) })
         }
     }
 });
 
 
-export const { useLoginMutation, useFetchEventsQuery, useRegisterUserMutation, useProfileQuery, useEventQuery, useCreateEventMutation } = apiSlice;
+export const { useLoginMutation, useFetchEventsQuery, useRegisterUserMutation, useProfileQuery, useEventQuery, useCreateEventMutation, useDeleteAccountMutation, useChangePasswordMutation } = apiSlice;
