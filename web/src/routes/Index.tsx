@@ -26,6 +26,7 @@ function Index() {
           <div className="flex justify-center space-x-4 mt-8">
             <Link to="/register" className="text-green-500 hover:underline">Register</Link>
             <Link to="/login" className="text-green-500 hover:underline">Login</Link>
+            <Link to="/events" className="text-green-500 hover:underline">Events</Link>
           </div>
         </div>
       </div>
