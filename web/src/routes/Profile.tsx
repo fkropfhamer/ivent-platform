@@ -46,6 +46,7 @@ export const Profile = () => {
                 <h2 className="text-xl font-bold mb-2">Change Password</h2>
                 <ChangePasswordForm/>
             </div>
+            <h2 className="text-xl font-bold mb-2">Account Deletion</h2>
             <button
                 className="w-full bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 text-lg mb-6"
                 onClick={deleteAccount}
