@@ -157,6 +157,7 @@ func LoginHandle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token":         token,
 		"refresh-token": refreshToken,
+		"role":          user.Role,
 	})
 }
 

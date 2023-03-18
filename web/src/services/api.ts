@@ -1,6 +1,6 @@
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 import { RootState } from '../app/store';
-import { logout, setToken } from '../features/auth/auth-slice';
+import {logout, Role, setToken} from '../features/auth/auth-slice';
 
 interface Profile {
     username: string,
@@ -61,7 +61,7 @@ export const apiSlice = createApi({
     baseQuery: baseQueryWithReauth,
     endpoints(builder) {
         return {
-            login: builder.mutation<{ token: string, "refresh-token": string }, { username: string, password: string }>({ query: (credentials) => ({ url: 'auth/login', method: 'POST', body: credentials }) }),
+            login: builder.mutation<{ token: string, "refresh-token": string, role: Role }, { username: string, password: string }>({ query: (credentials) => ({ url: 'auth/login', method: 'POST', body: credentials }) }),
             event: builder.query<Event, string>({ query: (id) => `events/${id}` }),
             createEvent: builder.mutation({ query: (event) => ({ url: 'events', method: 'POST', body: event }) }),
             fetchEvents: builder.query<{events: [Event], page: number, count: number }, number>({ query: (page) => `events?page=${page}` }),

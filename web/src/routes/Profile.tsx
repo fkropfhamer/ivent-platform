@@ -1,14 +1,16 @@
 import {Link, useNavigate} from "react-router-dom";
 import {useDeleteAccountMutation, useProfileQuery} from "../services/api"
-import {useDispatch} from "react-redux";
-import {logout} from "../features/auth/auth-slice";
+import {useDispatch, useSelector} from "react-redux";
+import {logout, Role} from "../features/auth/auth-slice";
 import {ChangePasswordForm} from "../components/ChangePasswordForm";
+import {RootState} from "../app/store";
 
 export const Profile = () => {
     const {data: profile, error, isLoading} = useProfileQuery();
     const navigate = useNavigate();
     const [deleteAcc, _] = useDeleteAccountMutation();
     const dispatch = useDispatch();
+    const role = useSelector((state: RootState) => state.auth.role)
 
     const deleteAccount = async () => {
         await deleteAcc().unwrap()
@@ -53,7 +55,7 @@ export const Profile = () => {
             >
                 Delete Account
             </button>
-
+            { role === Role.Admin ? <Link to={"/users"}>Users</Link> : null}
         </div>
     )
 }
