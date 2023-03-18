@@ -14,6 +14,10 @@ func runCommand(args []string) {
 	switch command := args[0]; command {
 	case "fixtures":
 		LoadFixtures()
+	case "clean-db":
+		CleanDB()
+	case "create-user":
+		CreateUser()
 	default:
 		fmt.Println("Command not found")
 	}
