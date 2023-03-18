@@ -15,7 +15,15 @@ type User struct {
 	Id       primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	Name     string
 	Password string
+	Roles    Role
 }
+
+type Role string
+
+const (
+	RoleAdmin Role = "ROLE_ADMIN"
+	RoleUser  Role = "ROLE_USER"
+)
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 13)
