@@ -175,7 +175,6 @@ func ChangePasswordHandle(c *gin.Context) {
 	}
 
 	var body ChangePasswordRequestBody
-
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid body",

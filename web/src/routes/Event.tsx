@@ -1,9 +1,6 @@
 import {useParams} from "react-router-dom"
 import {useEventQuery} from "../services/api"
 
-type EventParams = {
-    id: string
-}
 
 export const Event = () => {
     const {id} = useParams<{ id: string }>()
