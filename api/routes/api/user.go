@@ -5,6 +5,7 @@ import (
 	"ivent-api/db"
 	"ivent-api/models"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,7 @@ import (
 )
 
 func ProfileHandle(c *gin.Context) {
-	userId, err := Authenticate(c)
+	userId, err := Authenticate(c, models.RoleUser)
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -112,6 +113,7 @@ func RegisterHandle(c *gin.Context) {
 		Id:       primitive.NewObjectID(),
 		Name:     body.Username,
 		Password: body.Password,
+		Role:     models.RoleUser,
 	}
 
 	err := models.CreateUser(&newUser)
@@ -129,7 +131,7 @@ func RegisterHandle(c *gin.Context) {
 }
 
 func DeleteAccountHandle(c *gin.Context) {
-	id, err := Authenticate(c)
+	id, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
@@ -165,7 +167,7 @@ type ChangePasswordRequestBody struct {
 }
 
 func ChangePasswordHandle(c *gin.Context) {
-	id, err := Authenticate(c)
+	id, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
@@ -201,5 +203,37 @@ func ChangePasswordHandle(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "password updated",
+	})
+}
+
+func ListUsersHandle(c *gin.Context) {
+	if _, err := Authenticate(c, models.RoleAdmin); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	pageParam := c.Query("page")
+	page, err := strconv.ParseInt(pageParam, 10, 64)
+	if err != nil {
+		page = 0
+	}
+
+	users, count, err := models.GetUsers(page)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"users": users,
+		"count": count,
+		"page":  page,
 	})
 }

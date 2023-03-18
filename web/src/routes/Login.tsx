@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {setRefreshToken, setToken} from "../features/auth/auth-slice";
+import {setRefreshToken, setRole, setToken} from "../features/auth/auth-slice";
 import {useLoginMutation} from "../services/api";
 
 export const Login = () => {
@@ -17,11 +17,10 @@ export const Login = () => {
     const onFormSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
-        const tokens = await login(formState).unwrap();
-        dispatch(setToken(tokens.token));
-        dispatch(setRefreshToken(tokens["refresh-token"]));
-
-        console.log(tokens);
+        const loginResponse = await login(formState).unwrap();
+        dispatch(setToken(loginResponse.token));
+        dispatch(setRefreshToken(loginResponse["refresh-token"]));
+        dispatch(setRole(loginResponse.role))
 
         navigate("/events");
     };
