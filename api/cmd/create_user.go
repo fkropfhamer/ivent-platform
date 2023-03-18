@@ -46,7 +46,7 @@ func getCredentials() (string, string, error) {
 	}
 
 	fmt.Print("Enter Password: ")
-	bytePassword, err := term.ReadPassword(syscall.Stdin)
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return "", "", err
 	}
