@@ -13,7 +13,7 @@ import (
 )
 
 func ProfileHandle(c *gin.Context) {
-	userId, err := Authenticate(c)
+	userId, err := Authenticate(c, models.RoleUser)
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -112,6 +112,7 @@ func RegisterHandle(c *gin.Context) {
 		Id:       primitive.NewObjectID(),
 		Name:     body.Username,
 		Password: body.Password,
+		Role:     models.RoleUser,
 	}
 
 	err := models.CreateUser(&newUser)
@@ -129,7 +130,7 @@ func RegisterHandle(c *gin.Context) {
 }
 
 func DeleteAccountHandle(c *gin.Context) {
-	id, err := Authenticate(c)
+	id, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
@@ -165,7 +166,7 @@ type ChangePasswordRequestBody struct {
 }
 
 func ChangePasswordHandle(c *gin.Context) {
-	id, err := Authenticate(c)
+	id, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",

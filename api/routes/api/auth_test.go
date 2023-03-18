@@ -6,8 +6,8 @@ import (
 )
 
 type hasRoleTests struct {
-	userRole, neededRole models.Role
-	expected             bool
+	userRole, requiredRole models.Role
+	expected               bool
 }
 
 func TestHasRole(t *testing.T) {
@@ -19,8 +19,8 @@ func TestHasRole(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		if result := hasRole(testCase.userRole, testCase.neededRole); result != testCase.expected {
-			t.Fatalf(`Expected hasRole to be %t for (%s, %s) but got %t`, testCase.expected, testCase.userRole, testCase.neededRole, result)
+		if result := hasRole(testCase.userRole, testCase.requiredRole); result != testCase.expected {
+			t.Fatalf(`Expected hasRole to be %t for (%s, %s) but got %t`, testCase.expected, testCase.userRole, testCase.requiredRole, result)
 		}
 	}
 }

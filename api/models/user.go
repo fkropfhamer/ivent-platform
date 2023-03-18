@@ -15,7 +15,7 @@ type User struct {
 	Id       primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	Name     string
 	Password string
-	Roles    Role
+	Role     Role
 }
 
 type Role string
@@ -80,4 +80,16 @@ func UpdatePassword(id *primitive.ObjectID, newPassword string) error {
 	err = DeleteAllRefreshTokenForUser(id)
 
 	return err
+}
+
+func GetUser(id *primitive.ObjectID) (*User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var user User
+	if err := db.UserCollection.FindOne(ctx, bson.M{"_id": id}).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
