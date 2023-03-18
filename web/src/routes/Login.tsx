@@ -14,20 +14,31 @@ export const Login = () => {
         password: "",
     });
 
+    const [loginError, setLoginError] = useState({text: "", duration: 0});
+
     const onFormSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
-        const loginResponse = await login(formState).unwrap();
-        dispatch(setToken(loginResponse.token));
-        dispatch(setRefreshToken(loginResponse["refresh-token"]));
-        dispatch(setRole(loginResponse.role))
+        try {
+            const loginResponse = await login(formState).unwrap();
+            dispatch(setToken(loginResponse.token));
+            dispatch(setRefreshToken(loginResponse["refresh-token"]));
+            dispatch(setRole(loginResponse.role));
+            navigate("/events");
+        } catch (error) {
+            setLoginError({text: "Invalid username or password. Please try again.", duration: 3000});
+        }
 
-        navigate("/events");
     };
 
     return (
         <div className="w-96 bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
             <h1 className="text-3xl text-center font-bold mb-6">Login</h1>
+            {loginError.text && (
+                <p className="text-red-500 text-lg mb-4">
+                    {loginError.text}
+                </p>
+            )}
             <form>
                 <label className="block text-lg mb-4">Username</label>
                 <input
