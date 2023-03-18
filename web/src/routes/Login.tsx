@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import {setRefreshToken, setRole, setToken} from "../features/auth/auth-slice";
@@ -16,7 +16,7 @@ export const Login = () => {
 
     const [loginError, setLoginError] = useState({text: "", duration: 0});
 
-    const onFormSubmit = async (e: { preventDefault: () => void; }) => {
+    const submit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
@@ -27,6 +27,7 @@ export const Login = () => {
             navigate("/events");
         } catch (error) {
             setLoginError({text: "Invalid username or password. Please try again.", duration: 3000});
+            setFormState((prev) => ({...prev, password: ""}))
         }
 
     };
@@ -39,7 +40,7 @@ export const Login = () => {
                     {loginError.text}
                 </p>
             )}
-            <form>
+            <form onSubmit={submit}>
                 <label className="block text-lg mb-4">Username</label>
                 <input
                     type="text"
@@ -60,7 +61,6 @@ export const Login = () => {
                 />
                 <button
                     className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-6"
-                    onClick={onFormSubmit}
                 >
                     Submit
                 </button>
