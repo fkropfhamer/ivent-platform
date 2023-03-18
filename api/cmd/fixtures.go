@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ivent-api/db"
 	"ivent-api/models"
@@ -40,12 +41,10 @@ func createTestUser() *models.User {
 	return &testUser
 }
 
-func loadFixtures() {
+func LoadFixtures() {
+	fmt.Println("Loading fixtures...")
 	db.DB.Drop(context.Background())
 	testUser := createTestUser()
 	createExampleEvents(testUser)
-}
-
-func main() {
-	loadFixtures()
+	fmt.Println("Fixtures loaded successfully")
 }

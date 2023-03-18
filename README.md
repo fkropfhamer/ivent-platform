@@ -6,8 +6,15 @@
 - `cd api`
 - `go run .`
 - api available at http://localhost:8080
-- load fixtures `go run ./fixtures`
 ### web
 - `cd web`
 - `npm run dev`
 - available at http://localhost:5173
+
+## Commands
+run with `go run ./cmd [command]`
+
+Available commands:
+- `fixtures` load fixtures
+- `clean-db` cleans db
+- `create-user` prompt to create user

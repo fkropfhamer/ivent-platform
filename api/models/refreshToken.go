@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"ivent-api/config"
 	"ivent-api/db"
 	"time"
 
@@ -40,6 +41,16 @@ func DeleteRefreshToken(id primitive.ObjectID) error {
 	defer cancel()
 
 	_, err := db.RefreshTokenCollection.DeleteOne(ctx, bson.M{"_id": id})
+
+	return err
+}
+
+func DeleteAllExpiredTokens() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	limit := time.Now().Unix() - config.RefreshLifetime
+	_, err := db.RefreshTokenCollection.DeleteMany(ctx, bson.M{"iat": bson.M{"$lt": limit}})
 
 	return err
 }
