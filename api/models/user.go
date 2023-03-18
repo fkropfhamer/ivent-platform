@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"ivent-api/db"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,9 +15,9 @@ import (
 
 type User struct {
 	Id       primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name     string
-	Password string
-	Role     Role
+	Name     string             `json:"name"`
+	Role     Role               `json:"role"`
+	Password string             `json:"-"`
 }
 
 type Role string
@@ -92,4 +94,42 @@ func GetUser(id *primitive.ObjectID) (*User, error) {
 	}
 
 	return &user, nil
+}
+
+func GetUsers(page int64) ([]User, int64, error) {
+	pageLimit := int64(15)
+	skip := page * pageLimit
+	filter := bson.D{}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	count, err := db.UserCollection.CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	opts := options.FindOptions{
+		Skip:  &skip,
+		Limit: &pageLimit,
+	}
+
+	cursor, err := db.UserCollection.Find(ctx, filter, &opts)
+	if err != nil {
+		return nil, count, err
+	}
+
+	results := []User{}
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := cursor.All(ctx, &results); err != nil {
+		log.Fatal(err)
+
+		return nil, count, err
+	}
+
+	return results, count, nil
 }

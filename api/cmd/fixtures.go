@@ -45,6 +45,7 @@ func createTestUser() *models.User {
 		Id:       primitive.NewObjectID(),
 		Name:     "TestUser",
 		Password: "admin",
+		Role:     models.RoleUser,
 	}
 
 	err := models.CreateUser(&testUser)

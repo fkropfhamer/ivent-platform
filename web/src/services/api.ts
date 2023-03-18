@@ -1,6 +1,6 @@
 import { BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 import { RootState } from '../app/store';
-import { logout, setRefreshToken, setToken } from '../features/auth/auth-slice';
+import { logout, setToken } from '../features/auth/auth-slice';
 
 interface Profile {
     username: string,
@@ -10,6 +10,12 @@ interface Profile {
 export interface Event {
     name: string,
     id: string
+}
+
+export interface User {
+    id: string,
+    name: string,
+    role: string
 }
 
 const baseUrl = import.meta.env.PROD ? '/api/' : 'http://localhost:8080/api/'
@@ -59,6 +65,7 @@ export const apiSlice = createApi({
             event: builder.query<Event, string>({ query: (id) => `events/${id}` }),
             createEvent: builder.mutation({ query: (event) => ({ url: 'events', method: 'POST', body: event }) }),
             fetchEvents: builder.query<{events: [Event], page: number, count: number }, number>({ query: (page) => `events?page=${page}` }),
+            fetchUsers: builder.query<{users: [User], page: number, count: number }, number>({ query: (page) => `users?page=${page}` }),
             registerUser: builder.mutation({ query: (credentials) => ({ url: 'users/register', method: 'POST', body: credentials }) }),
             profile: builder.query<Profile, void>({ query: () => 'users/profile' }),
             deleteAccount: builder.mutation<void, void>({query: () => ({url: 'users/profile', method: 'DELETE' })}),
@@ -68,4 +75,4 @@ export const apiSlice = createApi({
 });
 
 
-export const { useLoginMutation, useFetchEventsQuery, useRegisterUserMutation, useProfileQuery, useEventQuery, useCreateEventMutation, useDeleteAccountMutation, useChangePasswordMutation } = apiSlice;
+export const { useLoginMutation, useFetchEventsQuery, useFetchUsersQuery, useRegisterUserMutation, useProfileQuery, useEventQuery, useCreateEventMutation, useDeleteAccountMutation, useChangePasswordMutation } = apiSlice;
