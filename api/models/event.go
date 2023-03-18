@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"ivent-api/db"
 	"log"
-	"networking-events-api/db"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"

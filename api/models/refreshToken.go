@@ -2,7 +2,7 @@ package models
 
 import (
 	"context"
-	"networking-events-api/db"
+	"ivent-api/db"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"

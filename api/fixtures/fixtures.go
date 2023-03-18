@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"networking-events-api/db"
-	"networking-events-api/models"
+	"ivent-api/db"
+	"ivent-api/models"
 	"strconv"
 )
 

@@ -1,4 +1,4 @@
-module networking-events-api
+module ivent-api
 
 go 1.18
 

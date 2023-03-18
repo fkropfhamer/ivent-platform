@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
-	"networking-events-api/db"
+	"ivent-api/db"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"

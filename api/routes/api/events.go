@@ -1,8 +1,8 @@
 package api
 
 import (
+	"ivent-api/models"
 	"net/http"
-	"networking-events-api/models"
 	"strconv"
 
 	"github.com/gin-gonic/gin"

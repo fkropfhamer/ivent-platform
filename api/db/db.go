@@ -2,7 +2,7 @@ package db
 
 import (
 	"context"
-	"networking-events-api/config"
+	"ivent-api/config"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"

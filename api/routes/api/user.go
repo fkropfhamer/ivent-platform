@@ -2,9 +2,9 @@ package api
 
 import (
 	"context"
+	"ivent-api/db"
+	"ivent-api/models"
 	"net/http"
-	"networking-events-api/db"
-	"networking-events-api/models"
 	"time"
 
 	"github.com/gin-gonic/gin"

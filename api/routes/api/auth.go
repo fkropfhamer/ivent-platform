@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"ivent-api/config"
+	"ivent-api/db"
+	"ivent-api/models"
 	"net/http"
-	"networking-events-api/config"
-	"networking-events-api/db"
-	"networking-events-api/models"
 	"strings"
 	"time"
 

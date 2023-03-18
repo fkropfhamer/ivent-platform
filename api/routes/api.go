@@ -1,8 +1,8 @@
 package routes
 
 import (
+	"ivent-api/routes/api"
 	"net/http"
-	"networking-events-api/routes/api"
 
 	"github.com/gin-gonic/gin"
 )
