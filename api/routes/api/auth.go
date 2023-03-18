@@ -34,6 +34,18 @@ func createJWT(userID *primitive.ObjectID) string {
 	return tokenString
 }
 
+func hasRole(userRole models.Role, neededRole models.Role) bool {
+	if userRole == neededRole {
+		return true
+	}
+
+	if userRole == models.RoleAdmin {
+		return true
+	}
+
+	return false
+}
+
 func Authenticate(c *gin.Context) (*primitive.ObjectID, error) {
 	tokenString, err := extractToken(c)
 
