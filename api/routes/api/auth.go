@@ -128,7 +128,7 @@ func LoginHandle(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := db.UserCollection.FindOne(ctx, filter).Decode(&user); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusForbidden, gin.H{
 			"message": "bad username or password",
 		})
 
@@ -136,7 +136,7 @@ func LoginHandle(c *gin.Context) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password)); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusForbidden, gin.H{
 			"message": "bad username or password",
 		})
 
