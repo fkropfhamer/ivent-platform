@@ -12,6 +12,7 @@ import { Profile } from './routes/Profile'
 import { Events } from './routes/Events'
 import { Event } from './routes/Event'
 import { CreateEvent } from './routes/CreateEvent'
+import {Users} from "./routes/Users";
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             <Route path='events/:id' element={<Event />} />
             <Route path='events/create' element={<CreateEvent />} />
             <Route path='events' element={<Events />} />
+            <Route path='users' element={<Users />} />
             <Route index element={<Index />} />
           </Route>
         </Routes>

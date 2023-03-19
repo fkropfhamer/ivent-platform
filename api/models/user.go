@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"ivent-api/db"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,9 +15,17 @@ import (
 
 type User struct {
 	Id       primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name     string
-	Password string
+	Name     string             `json:"name"`
+	Role     Role               `json:"role"`
+	Password string             `json:"-"`
 }
+
+type Role string
+
+const (
+	RoleAdmin Role = "ROLE_ADMIN"
+	RoleUser  Role = "ROLE_USER"
+)
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 13)
@@ -72,4 +82,54 @@ func UpdatePassword(id *primitive.ObjectID, newPassword string) error {
 	err = DeleteAllRefreshTokenForUser(id)
 
 	return err
+}
+
+func GetUser(id *primitive.ObjectID) (*User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var user User
+	if err := db.UserCollection.FindOne(ctx, bson.M{"_id": id}).Decode(&user); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func GetUsers(page int64) ([]User, int64, error) {
+	pageLimit := int64(15)
+	skip := page * pageLimit
+	filter := bson.D{}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	count, err := db.UserCollection.CountDocuments(ctx, filter)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	opts := options.FindOptions{
+		Skip:  &skip,
+		Limit: &pageLimit,
+	}
+
+	cursor, err := db.UserCollection.Find(ctx, filter, &opts)
+	if err != nil {
+		return nil, count, err
+	}
+
+	results := []User{}
+	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := cursor.All(ctx, &results); err != nil {
+		log.Fatal(err)
+
+		return nil, count, err
+	}
+
+	return results, count, nil
 }

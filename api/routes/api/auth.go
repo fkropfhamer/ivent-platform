@@ -34,7 +34,19 @@ func createJWT(userID *primitive.ObjectID) string {
 	return tokenString
 }
 
-func Authenticate(c *gin.Context) (*primitive.ObjectID, error) {
+func hasRole(userRole models.Role, requiredRole models.Role) bool {
+	if userRole == requiredRole {
+		return true
+	}
+
+	if userRole == models.RoleAdmin {
+		return true
+	}
+
+	return false
+}
+
+func Authenticate(c *gin.Context, requiredRole models.Role) (*primitive.ObjectID, error) {
 	tokenString, err := extractToken(c)
 
 	if err != nil {
@@ -66,6 +78,15 @@ func Authenticate(c *gin.Context) (*primitive.ObjectID, error) {
 
 		if err != nil {
 			return nil, errors.New("invalid id")
+		}
+
+		user, err := models.GetUser(&userObjectId)
+		if err != nil {
+			return nil, err
+		}
+
+		if !hasRole(user.Role, requiredRole) {
+			return nil, errors.New("wrong role")
 		}
 
 		return &userObjectId, nil
@@ -136,6 +157,7 @@ func LoginHandle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token":         token,
 		"refresh-token": refreshToken,
+		"role":          user.Role,
 	})
 }
 

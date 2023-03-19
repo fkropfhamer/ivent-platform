@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useRegisterUserMutation} from "../services/api";
 
 export const Register = () => {
@@ -45,9 +45,9 @@ export const Register = () => {
             </form>
             <p className="text-lg text-center">
                 Already have an account?{' '}
-                <a href="/login" className="text-green-500 hover:underline">
+                <Link to="/login" className="text-green-500 hover:underline">
                     Login
-                </a>
+                </Link>
             </p>
         </div>
     );

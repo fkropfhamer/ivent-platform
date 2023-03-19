@@ -14,7 +14,7 @@ type createEventRequestBody struct {
 }
 
 func CreateEventHandler(c *gin.Context) {
-	userId, err := Authenticate(c)
+	userId, err := Authenticate(c, models.RoleUser)
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{

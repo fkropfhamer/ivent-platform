@@ -25,11 +25,27 @@ func createExampleEvents(testUser *models.User) {
 
 }
 
+func createAdmin() *models.User {
+	admin := models.User{
+		Id:       primitive.NewObjectID(),
+		Name:     "admin",
+		Password: "admin",
+		Role:     models.RoleAdmin,
+	}
+
+	if err := models.CreateUser(&admin); err != nil {
+		return nil
+	}
+
+	return &admin
+}
+
 func createTestUser() *models.User {
 	testUser := models.User{
 		Id:       primitive.NewObjectID(),
 		Name:     "TestUser",
 		Password: "admin",
+		Role:     models.RoleUser,
 	}
 
 	err := models.CreateUser(&testUser)
@@ -46,5 +62,6 @@ func LoadFixtures() {
 	db.DB.Drop(context.Background())
 	testUser := createTestUser()
 	createExampleEvents(testUser)
+	createAdmin()
 	fmt.Println("Fixtures loaded successfully")
 }

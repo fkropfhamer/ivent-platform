@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {useNavigate} from "react-router-dom";
-import {setRefreshToken, setToken} from "../features/auth/auth-slice";
+import {Link, useNavigate} from "react-router-dom";
+import {setRefreshToken, setRole, setToken} from "../features/auth/auth-slice";
 import {useLoginMutation} from "../services/api";
 
 export const Login = () => {
@@ -17,11 +17,10 @@ export const Login = () => {
     const onFormSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
-        const tokens = await login(formState).unwrap();
-        dispatch(setToken(tokens.token));
-        dispatch(setRefreshToken(tokens["refresh-token"]));
-
-        console.log(tokens);
+        const loginResponse = await login(formState).unwrap();
+        dispatch(setToken(loginResponse.token));
+        dispatch(setRefreshToken(loginResponse["refresh-token"]));
+        dispatch(setRole(loginResponse.role))
 
         navigate("/events");
     };
@@ -57,9 +56,9 @@ export const Login = () => {
             </form>
             <p className="text-lg text-center">
                 Don't have an account?{' '}
-                <a href="/register" className="text-green-500 hover:underline">
+                <Link to="/register" className="text-green-500 hover:underline">
                     Register
-                </a>
+                </Link>
             </p>
         </div>
     );
