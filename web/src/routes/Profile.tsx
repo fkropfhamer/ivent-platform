@@ -56,7 +56,7 @@ export const Profile = () => {
             >
                 Delete Account
             </button>
-            <h2 className="text-xl font-bold mb-2 mt-8">Admin Area</h2>
+            <h2 className="text-xl font-bold mb-2 mt-8">Admin Tools</h2>
             { role === Role.Admin ? <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-20" >
                 <Link to={"/users"}>Manage Accounts</Link>
             </div>: null}
