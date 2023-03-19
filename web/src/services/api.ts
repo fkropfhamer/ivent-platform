@@ -61,9 +61,8 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
       }
     }
 
-    api.dispatch(logout())
-    window.location.href = '/login'
-  }
+        api.dispatch(logout())
+    }
 
   return result
 }

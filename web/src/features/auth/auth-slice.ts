@@ -2,15 +2,17 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import type UserRole from '../../constants/roles'
 
 interface AuthState {
-  accessToken: string | null
-  refreshToken: string | null
-  role: UserRole | null
+    accessToken: string | null
+    refreshToken: string | null
+    role: UserRole | null
+    willRedirectToLogin: boolean
 }
+
 
 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
 const refreshToken = window.localStorage.getItem('refresh-token') ? window.localStorage.getItem('refresh-token') : null
 
-const initialState: AuthState = { accessToken: null, refreshToken, role: null }
+const initialState: AuthState = { accessToken: null, refreshToken, role: null, willRedirectToLogin: false };
 
 const authSlice = createSlice({
   name: 'auth',
@@ -29,14 +31,19 @@ const authSlice = createSlice({
       window.localStorage.setItem('refresh-token', action.payload)
     },
 
-    logout (state) {
-      state.accessToken = null
-      state.refreshToken = null
-      state.role = null
-      window.localStorage.setItem('refresh-token', '')
+    logout(state) {
+        state.accessToken = null
+        state.refreshToken = null
+        state.role = null
+        state.willRedirectToLogin = true
+        window.localStorage.setItem("refresh-token", "")
+    },
+
+    hasRedirectedToLogin(state) {
+        state.willRedirectToLogin = false
     }
   }
 })
 
-export const { setToken, logout, setRefreshToken, setRole } = authSlice.actions
-export default authSlice.reducer
+export const  { setToken, logout, setRefreshToken, setRole, hasRedirectedToLogin } = authSlice.actions;
+export default authSlice.reducer;
