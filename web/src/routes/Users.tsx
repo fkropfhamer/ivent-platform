@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 import {useFetchEventsQuery, useFetchUsersQuery, User} from "../services/api";
+import {Link} from "react-router-dom";
 
 export const Users = () => {
     const [page, setPage] = useState(0)
@@ -35,6 +36,9 @@ export const Users = () => {
                     <div className="px-4 py-2 text-gray-600 text-sm">{`ID: ${user.id}`}</div>
                 </div>
             ))}
+            <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-2" >
+                <Link to="/users/create"> Create User </Link>
+            </div>
         </div>
     )
 }
