@@ -229,3 +229,16 @@ func RefreshHandle(c *gin.Context) {
 		"token": token,
 	})
 }
+
+func parseBody[T any](c *gin.Context) (*T, error) {
+	var body T
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid body",
+		})
+
+		return nil, err
+	}
+
+	return &body, nil
+}
