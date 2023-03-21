@@ -362,14 +362,9 @@ func CreateServiceAccountHandle(c *gin.Context) {
 		return
 	}
 
-	id := primitive.NewObjectID()
-	token := createJWT(&id, models.RoleService)
-	user := models.User{Id: id, Role: models.RoleService, Name: body.Username, Token: token}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	_, err = db.UserCollection.InsertOne(ctx, user)
+	userId := primitive.NewObjectID()
+	token := createJWT(&userId, models.RoleService)
+	user, err := models.CreateServiceAccount(userId, body.Username, token)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
@@ -379,7 +374,7 @@ func CreateServiceAccountHandle(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
+		"token": user.Token,
 	})
 }
 

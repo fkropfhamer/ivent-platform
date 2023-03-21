@@ -142,3 +142,17 @@ func GetUsers(page int64) ([]User, int64, error) {
 
 	return results, count, nil
 }
+
+func CreateServiceAccount(id primitive.ObjectID, username string, token string) (*User, error) {
+	user := User{Id: id, Role: RoleService, Name: username, Token: token}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := db.UserCollection.InsertOne(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
