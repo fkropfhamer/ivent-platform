@@ -167,8 +167,8 @@ type registerRequestBody struct {
 }
 
 func RegisterHandle(c *gin.Context) {
-	var body registerRequestBody
-	if err := c.BindJSON(&body); err != nil {
+	body, err := parseBody[registerRequestBody](c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid body",
 		})
@@ -199,7 +199,7 @@ func RegisterHandle(c *gin.Context) {
 		Role:     models.RoleUser,
 	}
 
-	err := models.CreateUser(&newUser)
+	err = models.CreateUser(&newUser)
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -376,17 +376,4 @@ func CreateServiceAccountHandle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token": user.Token,
 	})
-}
-
-func parseBody[T any](c *gin.Context) (*T, error) {
-	var body T
-	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "invalid body",
-		})
-
-		return nil, err
-	}
-
-	return &body, nil
 }
