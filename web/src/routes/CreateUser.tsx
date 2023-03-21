@@ -8,7 +8,7 @@ export const CreateUser = () => {
         password: "",
         role: "ROLE_USER",
     });
-    const [create, {error}] = useCreateUserByAdminMutation()
+    const [create, _] = useCreateUserByAdminMutation()
     const navigate = useNavigate()
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -22,6 +22,7 @@ export const CreateUser = () => {
         })
 
         navigate("/users")
+        window.location.reload()
     }
 
     return (
