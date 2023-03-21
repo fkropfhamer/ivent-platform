@@ -197,6 +197,29 @@ func DeleteUserHandle(c *gin.Context) {
 	})
 }
 
+func DeleteUserByAdminHandle(c *gin.Context) {
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid id",
+		})
+		return
+	}
+
+	if err := models.DeleteUser(&id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "acc deleted",
+	})
+}
+
 type ChangePasswordRequestBody struct {
 	CurrentPassword string
 	NewPassword     string
