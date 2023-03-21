@@ -1,5 +1,5 @@
 import {useState} from "react"
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useCreateUserByAdminMutation} from "../services/api";
 
 export const CreateUser = () => {
@@ -61,6 +61,12 @@ export const CreateUser = () => {
                 >
                     Create
                 </button>
+                <Link
+                    to="/users"
+                    className="w-full text-center font-medium text-gray-600 hover:text-gray-900"
+                >
+                    Cancel
+                </Link>
             </form>
         </div>
     )
