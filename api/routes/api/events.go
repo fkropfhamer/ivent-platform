@@ -4,13 +4,16 @@ import (
 	"ivent-api/models"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type createEventRequestBody struct {
-	Name string
+	Name  string
+	End   string
+	Start string
 }
 
 func CreateEventHandler(c *gin.Context) {
@@ -45,6 +48,36 @@ func CreateEventHandler(c *gin.Context) {
 		ID:      primitive.NewObjectID(),
 		Name:    body.Name,
 		Creator: *userId,
+	}
+
+	if body.End != "" {
+		t, err := time.Parse(time.RFC3339, body.End)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "error",
+			})
+
+			return
+		}
+
+		datetime := primitive.NewDateTimeFromTime(t)
+
+		event.End = &datetime
+	}
+
+	if body.Start != "" {
+		t, err := time.Parse(time.RFC3339, body.Start)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "error",
+			})
+
+			return
+		}
+
+		datetime := primitive.NewDateTimeFromTime(t)
+
+		event.Start = &datetime
 	}
 
 	id, err := models.CreateEvent(&event)

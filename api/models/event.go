@@ -3,19 +3,22 @@ package models
 import (
 	"context"
 	"errors"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"ivent-api/db"
 	"log"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Event struct {
-	ID      primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name    string             `json:"name"`
-	Creator primitive.ObjectID
+	ID      primitive.ObjectID  `bson:"_id" json:"id,omitempty"`
+	Name    string              `json:"name"`
+	Start   *primitive.DateTime `bson:"start"`
+	End     *primitive.DateTime `bson:"end"`
+	Creator primitive.ObjectID  `bson:"creator"`
 }
 
 func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
