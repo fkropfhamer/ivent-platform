@@ -18,13 +18,15 @@ type User struct {
 	Name     string             `json:"name"`
 	Role     Role               `json:"role"`
 	Password string             `json:"-"`
+	Token    string             `json:"-"`
 }
 
 type Role string
 
 const (
-	RoleAdmin Role = "ROLE_ADMIN"
-	RoleUser  Role = "ROLE_USER"
+	RoleAdmin   Role = "ROLE_ADMIN"
+	RoleUser    Role = "ROLE_USER"
+	RoleService Role = "ROLE_SERVICE"
 )
 
 func hashPassword(password string) (string, error) {

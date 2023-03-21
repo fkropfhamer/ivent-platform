@@ -18,10 +18,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func createJWT(userID *primitive.ObjectID) string {
+func createJWT(userID *primitive.ObjectID, role models.Role) string {
 	claims := jwt.MapClaims{
-		"id":  userID.Hex(),
-		"iat": time.Now().Unix(),
+		"id":   userID.Hex(),
+		"iat":  time.Now().Unix(),
+		"role": role,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -36,6 +37,10 @@ func createJWT(userID *primitive.ObjectID) string {
 
 func hasRole(userRole models.Role, requiredRole models.Role) bool {
 	if userRole == requiredRole {
+		return true
+	}
+
+	if userRole == models.RoleUser && requiredRole == models.RoleService {
 		return true
 	}
 
@@ -66,16 +71,16 @@ func Authenticate(c *gin.Context, requiredRole models.Role) (*primitive.ObjectID
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		iat := int64(claims["iat"].(float64)) // I don't know why it is a float but ok.
-
-		if iat+config.TokenLifetime < time.Now().Unix() {
-			return nil, errors.New("token expired")
+		role := models.Role(claims["role"].(string))
+		if role != models.RoleService {
+			iat := int64(claims["iat"].(float64)) // I don't know why it is a float but ok.
+			if iat+config.TokenLifetime < time.Now().Unix() {
+				return nil, errors.New("token expired")
+			}
 		}
 
 		userId := claims["id"].(string)
-
 		userObjectId, err := primitive.ObjectIDFromHex(userId)
-
 		if err != nil {
 			return nil, errors.New("invalid id")
 		}
@@ -87,6 +92,10 @@ func Authenticate(c *gin.Context, requiredRole models.Role) (*primitive.ObjectID
 
 		if !hasRole(user.Role, requiredRole) {
 			return nil, errors.New("wrong role")
+		}
+
+		if user.Role == models.RoleService && user.Token != tokenString {
+			return nil, errors.New("wrong token")
 		}
 
 		return &userObjectId, nil
@@ -143,7 +152,7 @@ func LoginHandle(c *gin.Context) {
 		return
 	}
 
-	token := createJWT(&user.Id)
+	token := createJWT(&user.Id, user.Role)
 	refreshToken, err := models.CreateRefreshToken(&user.Id)
 
 	if err != nil {
@@ -205,7 +214,16 @@ func RefreshHandle(c *gin.Context) {
 		return
 	}
 
-	token := createJWT(&dbToken.User)
+	user, err := models.GetUser(&dbToken.User)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "user does not exist",
+		})
+
+		return
+	}
+
+	token := createJWT(&dbToken.User, user.Role)
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,

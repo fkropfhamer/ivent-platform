@@ -30,6 +30,7 @@ func NewRouter(handler *gin.Engine) {
 			userRouter.DELETE("/profile", api.DeleteAccountHandle)
 			userRouter.POST("/change-password", api.ChangePasswordHandle)
 			userRouter.GET("", api.ListUsersHandle)
+			userRouter.POST("/service", api.CreateServiceAccountHandle)
 		}
 
 		eventRouter := apiRouter.Group("/events")

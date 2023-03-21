@@ -52,7 +52,7 @@ func CreateUserHandle(c *gin.Context) {
 	var body createUserRequestBody
 
 	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "error",
 		})
 		return
@@ -84,7 +84,6 @@ type registerRequestBody struct {
 
 func RegisterHandle(c *gin.Context) {
 	var body registerRequestBody
-
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid body",
@@ -208,7 +207,7 @@ func ChangePasswordHandle(c *gin.Context) {
 
 func ListUsersHandle(c *gin.Context) {
 	if _, err := Authenticate(c, models.RoleAdmin); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusForbidden, gin.H{
 			"message": "error",
 		})
 
@@ -236,4 +235,56 @@ func ListUsersHandle(c *gin.Context) {
 		"count": count,
 		"page":  page,
 	})
+}
+
+type createServiceAccountRequestBody struct {
+	Username string
+}
+
+func CreateServiceAccountHandle(c *gin.Context) {
+	if _, err := Authenticate(c, models.RoleAdmin); err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	body, err := parseBody[createServiceAccountRequestBody](c)
+	if err != nil {
+		return
+	}
+
+	id := primitive.NewObjectID()
+	token := createJWT(&id, models.RoleService)
+	user := models.User{Id: id, Role: models.RoleService, Name: body.Username, Token: token}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err = db.UserCollection.InsertOne(ctx, user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
+}
+
+func parseBody[T any](c *gin.Context) (*T, error) {
+	var body T
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid body",
+		})
+
+		return nil, err
+	}
+
+	return &body, nil
 }
