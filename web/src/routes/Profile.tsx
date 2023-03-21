@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {logout, Role} from "../features/auth/auth-slice";
 import {ChangePasswordForm} from "../components/ChangePasswordForm";
 import {RootState} from "../app/store";
+import {CreateServiceAccountForm} from "../components/CreateServiceAccountForm";
 
 export const Profile = () => {
     const {data: profile, error, isLoading} = useProfileQuery();
@@ -60,7 +61,7 @@ export const Profile = () => {
             { role === Role.Admin ? <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-5" >
                 <Link to={"/users"}>Manage Accounts</Link>
             </div>: null}
-
+            <CreateServiceAccountForm />
         </div>
     )
 }
