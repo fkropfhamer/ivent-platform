@@ -77,6 +77,42 @@ func CreateUserHandle(c *gin.Context) {
 	})
 }
 
+type createUserByAdminRequestBody struct {
+	Username string
+	Password string
+	Role     models.Role
+}
+
+func CreateUserByAdminHandle(c *gin.Context) {
+	var body createUserByAdminRequestBody
+
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "error",
+		})
+		return
+	}
+
+	newUser := models.User{
+		Id:   primitive.NewObjectID(),
+		Name: body.Username,
+		Role: body.Role,
+	}
+
+	err := models.CreateUser(&newUser)
+
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "user created",
+	})
+}
+
 type registerRequestBody struct {
 	Username string
 	Password string
