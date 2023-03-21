@@ -1,6 +1,7 @@
 import {BaseQueryFn, createApi, FetchArgs, fetchBaseQuery, FetchBaseQueryError} from '@reduxjs/toolkit/query/react'
 import {RootState} from '../app/store';
 import {logout, Role, setToken} from '../features/auth/auth-slice';
+import {build} from "vite";
 
 interface Profile {
     username: string,
@@ -52,7 +53,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
         }
 
         api.dispatch(logout())
-        window.location.href = '/login'  
+        window.location.href = '/login'
     }
 
 
@@ -75,6 +76,12 @@ export const apiSlice = createApi({
             createEvent: builder.mutation({query: (event) => ({url: 'events', method: 'POST', body: event})}),
             fetchEvents: builder.query<{ events: [Event], page: number, count: number }, number>({query: (page) => `events?page=${page}`}),
             createUserByAdmin: builder.mutation({query: (user) => ({url: 'users/create', method: 'POST', body: user})}),
+            deleteUserByAdmin: builder.mutation<void, string>({
+                query: (id) => ({
+                    url: `users/${id}`,
+                    method: 'DELETE'
+                })
+            }),            fetchUsers: builder.query<{ users: [User], page: number, count: number }, number>({query: (page) => `users?page=${page}`}),
             fetchUsers: builder.query<{ users: [User], page: number, count: number }, number>({query: (page) => `users?page=${page}`}),
             registerUser: builder.mutation({
                 query: (credentials) => ({
@@ -107,5 +114,6 @@ export const {
     useCreateEventMutation,
     useCreateUserByAdminMutation,
     useDeleteUserMutation,
+    useDeleteUserByAdminMutation,
     useChangePasswordMutation
 } = apiSlice;
