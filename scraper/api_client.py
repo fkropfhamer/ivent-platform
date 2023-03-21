@@ -1,4 +1,6 @@
 import requests
+from config import token
+
 
 class ApiClient:
     def __init__(self, api_key, base_url="http://localhost:8080/api") -> None:
@@ -42,3 +44,4 @@ class ApiClient:
         return events
 
 
+api_client = ApiClient(token)
