@@ -32,6 +32,7 @@ func NewRouter(handler *gin.Engine) {
 			userRouter.DELETE("/profile", api.DeleteUserHandle)
 			userRouter.POST("/change-password", api.ChangePasswordHandle)
 			userRouter.GET("", api.ListUsersHandle)
+			userRouter.POST("/service", api.CreateServiceAccountHandle)
 			userRouter.DELETE("/:id", api.DeleteUserByAdminHandle)
 		}
 
