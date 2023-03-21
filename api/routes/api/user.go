@@ -113,6 +113,34 @@ func CreateUserByAdminHandle(c *gin.Context) {
 	})
 }
 
+type changeUserByAdminRequestBody struct {
+	Id      primitive.ObjectID
+	NewRole models.Role
+}
+
+func ChangeUserRoleByAdminHandle(c *gin.Context) {
+	var body changeUserByAdminRequestBody
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid body",
+		})
+
+		return
+	}
+
+	if err := models.UpdateUserRole(&body.Id, body.NewRole); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "password updated",
+	})
+}
+
 type registerRequestBody struct {
 	Username string
 	Password string

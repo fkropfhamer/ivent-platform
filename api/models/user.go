@@ -84,6 +84,13 @@ func UpdatePassword(id *primitive.ObjectID, newPassword string) error {
 	return err
 }
 
+func UpdateUserRole(id *primitive.ObjectID, newUserRole Role) error {
+	if err := UpdateUser(id, bson.M{"$set": bson.M{"role": newUserRole}}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func GetUser(id *primitive.ObjectID) (*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
