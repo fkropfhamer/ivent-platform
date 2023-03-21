@@ -99,7 +99,8 @@ export const apiSlice = createApi({
                     method: 'POST',
                     body
                 })
-            })
+            }),
+            createServiceAccount: builder.mutation<{ token: string }, {name: string}>({query: (body) => ({ url: 'users/service', method: 'POST', body })})
         }
     }
 });
@@ -117,5 +118,5 @@ export const {
     useDeleteUserMutation,
     useDeleteUserByAdminMutation,
     useChangeUserRoleByAdminMutation,
-    useChangePasswordMutation
+    useChangePasswordMutation,
 } = apiSlice;
