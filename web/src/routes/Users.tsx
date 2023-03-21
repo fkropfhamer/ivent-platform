@@ -1,5 +1,10 @@
 import {useEffect, useState} from "react";
-import {useCreateUserByAdminMutation, useDeleteUserByAdminMutation, useFetchUsersQuery, User} from "../services/api";
+import {
+    useChangeUserRoleByAdminMutation,
+    useDeleteUserByAdminMutation,
+    useFetchUsersQuery,
+    User
+} from "../services/api";
 import {Link} from "react-router-dom";
 
 export const Users = () => {
@@ -7,6 +12,7 @@ export const Users = () => {
     const [users, setUsers] = useState<User[]>([])
     const {data, isFetching} = useFetchUsersQuery(page);
     const [deleteUserByAdmin, _] = useDeleteUserByAdminMutation()
+    const [changeUserRoleByAdmin, __] = useChangeUserRoleByAdminMutation()
 
     useEffect(() => {
         if (!data) {
@@ -25,8 +31,12 @@ export const Users = () => {
         return <div>Loading</div>
     }
 
-    function handleRoleChange(id: string, value: string) {
-        
+    function handleRoleChange(id: string, newRole: string) {
+        changeUserRoleByAdmin({
+            id: id,
+            newRole: newRole,
+        })
+        window.location.reload()
     }
 
     function handleDeleteUser(id: string) {
