@@ -12,6 +12,9 @@ jobs:
   run-linters:
     name: Run linters for web
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./web
 
     steps:
       - name: Check out Git repository
@@ -21,9 +24,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 17
-
-      - name: Change into web dir
-        run: cd web
 
       - name: Install Node.js dependencies
         run: npm ci
