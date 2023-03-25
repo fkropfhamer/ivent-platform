@@ -1,34 +1,34 @@
-import {Link, useNavigate} from "react-router-dom";
-import {useDeleteUserMutation, useProfileQuery} from "../services/api"
-import {useDispatch, useSelector} from "react-redux";
-import {logout, Role} from "../features/auth/auth-slice";
-import {ChangePasswordForm} from "../components/ChangePasswordForm";
-import {RootState} from "../app/store";
-import {CreateServiceAccountForm} from "../components/CreateServiceAccountForm";
+import { Link, useNavigate } from 'react-router-dom'
+import { useDeleteUserMutation, useProfileQuery } from '../services/api'
+import { useDispatch, useSelector } from 'react-redux'
+import { logout, Role } from '../features/auth/auth-slice'
+import { ChangePasswordForm } from '../components/ChangePasswordForm'
+import { type RootState } from '../app/store'
+import { CreateServiceAccountForm } from '../components/CreateServiceAccountForm'
 
-export const Profile = () => {
-    const {data: profile, error, isLoading} = useProfileQuery();
-    const navigate = useNavigate();
-    const [deleteAcc, _] = useDeleteUserMutation();
-    const dispatch = useDispatch();
-    const role = useSelector((state: RootState) => state.auth.role)
+export const Profile = (): JSX.Element => {
+  const { data: profile, error, isLoading } = useProfileQuery()
+  const navigate = useNavigate()
+  const [deleteAcc, _] = useDeleteUserMutation()
+  const dispatch = useDispatch()
+  const role = useSelector((state: RootState) => state.auth.role)
 
-    const deleteUser = async () => {
-        await deleteAcc().unwrap()
-        dispatch(logout())
+  const deleteUser = async (): Promise<void> => {
+    await deleteAcc().unwrap()
+    dispatch(logout())
 
-        navigate("/")
-    }
+    navigate('/')
+  }
 
-    if (isLoading) {
-        return <h1>Loading...</h1>
-    }
+  if (isLoading) {
+    return <h1>Loading...</h1>
+  }
 
-    if (error && 'data' in error) {
-        return <h1>{error.status} {JSON.stringify(error.data)}</h1>
-    }
+  if ((error != null) && 'data' in error) {
+    return <h1>{error.status} {JSON.stringify(error.data)}</h1>
+  }
 
-    return (
+  return (
         <div className="w-96 bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
             <h1 className="text-3xl text-center font-bold mb-6">Profile</h1>
             <ul className="mb-6">
@@ -53,15 +53,17 @@ export const Profile = () => {
             <h2 className="text-xl font-bold mb-2">Manage Your Data</h2>
             <button
                 className="w-full bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 text-lg mb-6"
-                onClick={deleteUser}
+                onClick={() => { void deleteUser() }}
             >
                 Delete User Account
             </button>
             <h2 className="text-xl font-bold mb-2 mt-8">Admin Tools</h2>
-            { role === Role.Admin ? <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-5" >
-                <Link to={"/users"}>Manage Users</Link>
-            </div>: null}
+            { role === Role.Admin
+              ? <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-5" >
+                <Link to={'/users'}>Manage Users</Link>
+            </div>
+              : null}
             <CreateServiceAccountForm />
         </div>
-    )
+  )
 }

@@ -1,19 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import {Provider} from 'react-redux'
-import {BrowserRouter, Route, Routes} from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import App from './App'
-import {store} from './app/store'
+import { store } from './app/store'
 import './index.css'
 import Index from './routes/Index'
-import {Login} from './routes/Login'
-import {Register} from './routes/Register'
-import {Profile} from './routes/Profile'
-import {Events} from './routes/Events'
-import {Event} from './routes/Event'
-import {CreateEvent} from './routes/CreateEvent'
-import {Users} from "./routes/Users";
-import {CreateUser} from "./routes/CreateUser"
+import { Login } from './routes/Login'
+import { Register } from './routes/Register'
+import { Profile } from './routes/Profile'
+import { Events } from './routes/Events'
+import { Event } from './routes/Event'
+import { CreateEvent } from './routes/CreateEvent'
+import { Users } from './routes/Users'
+import { CreateUser } from './routes/CreateUser'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
