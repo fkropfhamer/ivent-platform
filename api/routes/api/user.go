@@ -52,7 +52,7 @@ func CreateUserHandle(c *gin.Context) {
 	var body createUserRequestBody
 
 	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "error",
 		})
 		return
@@ -167,9 +167,8 @@ type registerRequestBody struct {
 }
 
 func RegisterHandle(c *gin.Context) {
-	var body registerRequestBody
-
-	if err := c.BindJSON(&body); err != nil {
+	body, err := parseBody[registerRequestBody](c)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid body",
 		})
@@ -200,7 +199,7 @@ func RegisterHandle(c *gin.Context) {
 		Role:     models.RoleUser,
 	}
 
-	err := models.CreateUser(&newUser)
+	err = models.CreateUser(&newUser)
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -315,7 +314,7 @@ func ChangePasswordHandle(c *gin.Context) {
 
 func ListUsersHandle(c *gin.Context) {
 	if _, err := Authenticate(c, models.RoleAdmin); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusForbidden, gin.H{
 			"message": "error",
 		})
 
@@ -342,5 +341,39 @@ func ListUsersHandle(c *gin.Context) {
 		"users": users,
 		"count": count,
 		"page":  page,
+	})
+}
+
+type createServiceAccountRequestBody struct {
+	Username string
+}
+
+func CreateServiceAccountHandle(c *gin.Context) {
+	if _, err := Authenticate(c, models.RoleAdmin); err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	body, err := parseBody[createServiceAccountRequestBody](c)
+	if err != nil {
+		return
+	}
+
+	userId := primitive.NewObjectID()
+	token := createJWT(&userId, models.RoleService)
+	user, err := models.CreateServiceAccount(userId, body.Username, token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": user.Token,
 	})
 }

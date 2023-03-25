@@ -18,13 +18,15 @@ type User struct {
 	Name     string             `json:"name"`
 	Role     Role               `json:"role"`
 	Password string             `json:"-"`
+	Token    string             `json:"-"`
 }
 
 type Role string
 
 const (
-	RoleAdmin Role = "ROLE_ADMIN"
-	RoleUser  Role = "ROLE_USER"
+	RoleAdmin   Role = "ROLE_ADMIN"
+	RoleUser    Role = "ROLE_USER"
+	RoleService Role = "ROLE_SERVICE"
 )
 
 func hashPassword(password string) (string, error) {
@@ -139,4 +141,18 @@ func GetUsers(page int64) ([]User, int64, error) {
 	}
 
 	return results, count, nil
+}
+
+func CreateServiceAccount(id primitive.ObjectID, username string, token string) (*User, error) {
+	user := User{Id: id, Role: RoleService, Name: username, Token: token}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	_, err := db.UserCollection.InsertOne(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
