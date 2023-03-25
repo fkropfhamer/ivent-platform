@@ -27,7 +27,7 @@ func NewRouter(handler *gin.Engine) {
 			userRouter.GET("/profile", api.ProfileHandle)
 			userRouter.POST("", api.CreateUserHandle)
 			userRouter.POST("/create", api.CreateUserByAdminHandle)
-			userRouter.POST("/change-role", api.ChangeUserRoleByAdminHandle)
+			userRouter.PUT("/change-role", api.ChangeUserRoleByAdminHandle)
 			userRouter.POST("/register", api.RegisterHandle)
 			userRouter.DELETE("/profile", api.DeleteUserHandle)
 			userRouter.POST("/change-password", api.ChangePasswordHandle)
