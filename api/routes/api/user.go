@@ -52,7 +52,7 @@ func CreateUserHandle(c *gin.Context) {
 	var body createUserRequestBody
 
 	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
 		return
@@ -66,7 +66,7 @@ func CreateUserHandle(c *gin.Context) {
 	err := models.CreateUser(&newUser)
 
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
 		return
@@ -74,6 +74,90 @@ func CreateUserHandle(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "user created",
+	})
+}
+
+type createUserByAdminRequestBody struct {
+	Username string
+	Password string
+	Role     models.Role
+}
+
+func CreateUserByAdminHandle(c *gin.Context) {
+	_, err := Authenticate(c, models.RoleAdmin)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "error with id: ${id}",
+		})
+
+		return
+	}
+
+	var body createUserByAdminRequestBody
+
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+		return
+	}
+
+	newUser := models.User{
+		Id:   primitive.NewObjectID(),
+		Name: body.Username,
+		Role: body.Role,
+	}
+
+	err = models.CreateUser(&newUser)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "user created",
+	})
+}
+
+type changeUserByAdminRequestBody struct {
+	Id      primitive.ObjectID
+	NewRole models.Role
+}
+
+func ChangeUserRoleByAdminHandle(c *gin.Context) {
+	_, err := Authenticate(c, models.RoleAdmin)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "error with id: ${id}",
+		})
+
+		return
+	}
+
+	var body changeUserByAdminRequestBody
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "invalid body",
+		})
+
+		return
+	}
+
+	if err := models.UpdateUserRole(&body.Id, body.NewRole); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "password updated",
 	})
 }
 
@@ -149,6 +233,29 @@ func DeleteUserHandle(c *gin.Context) {
 	}
 
 	if err := models.DeleteAllRefreshTokenForUser(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "acc deleted",
+	})
+}
+
+func DeleteUserByAdminHandle(c *gin.Context) {
+	id, err := primitive.ObjectIDFromHex(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid id",
+		})
+		return
+	}
+
+	if err := models.DeleteUser(&id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
