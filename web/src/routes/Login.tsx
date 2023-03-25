@@ -55,7 +55,7 @@ export const Login = () => {
                 </button>
             </form>
             <p className="text-lg text-center">
-                Don't have an account?{' '}
+                Join now and get started!{' '}
                 <Link to="/register" className="text-green-500 hover:underline">
                     Register
                 </Link>
