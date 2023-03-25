@@ -130,7 +130,7 @@ func RegisterHandle(c *gin.Context) {
 	})
 }
 
-func DeleteAccountHandle(c *gin.Context) {
+func DeleteUserHandle(c *gin.Context) {
 	id, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{

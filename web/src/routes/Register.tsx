@@ -44,7 +44,7 @@ export const Register = () => {
                 </button>
             </form>
             <p className="text-lg text-center">
-                Already have an account?{' '}
+                Already signed up?{' '}
                 <Link to="/login" className="text-green-500 hover:underline">
                     Login
                 </Link>

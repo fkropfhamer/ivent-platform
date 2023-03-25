@@ -1,5 +1,5 @@
 import {Link, useNavigate} from "react-router-dom";
-import {useDeleteAccountMutation, useProfileQuery} from "../services/api"
+import {useDeleteUserMutation, useProfileQuery} from "../services/api"
 import {useDispatch, useSelector} from "react-redux";
 import {logout, Role} from "../features/auth/auth-slice";
 import {ChangePasswordForm} from "../components/ChangePasswordForm";
@@ -8,11 +8,11 @@ import {RootState} from "../app/store";
 export const Profile = () => {
     const {data: profile, error, isLoading} = useProfileQuery();
     const navigate = useNavigate();
-    const [deleteAcc, _] = useDeleteAccountMutation();
+    const [deleteAcc, _] = useDeleteUserMutation();
     const dispatch = useDispatch();
     const role = useSelector((state: RootState) => state.auth.role)
 
-    const deleteAccount = async () => {
+    const deleteUser = async () => {
         await deleteAcc().unwrap()
         dispatch(logout())
 
@@ -49,16 +49,16 @@ export const Profile = () => {
                 <h2 className="text-xl font-bold mb-2">Change Password</h2>
                 <ChangePasswordForm/>
             </div>
-            <h2 className="text-xl font-bold mb-2">Account Deletion</h2>
+            <h2 className="text-xl font-bold mb-2">Manage Your Data</h2>
             <button
                 className="w-full bg-red-500 hover:bg-red-600 text-white rounded-lg py-2 text-lg mb-6"
-                onClick={deleteAccount}
+                onClick={deleteUser}
             >
-                Delete Account
+                Delete User Account
             </button>
             <h2 className="text-xl font-bold mb-2 mt-8">Admin Tools</h2>
             { role === Role.Admin ? <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-5" >
-                <Link to={"/users"}>Manage Accounts</Link>
+                <Link to={"/users"}>Manage Users</Link>
             </div>: null}
 
         </div>
