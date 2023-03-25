@@ -1,4 +1,4 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import {useDispatch} from "react-redux";
 import {Link, useNavigate} from "react-router-dom";
 import {setRefreshToken, setRole, setToken} from "../features/auth/auth-slice";
@@ -14,21 +14,33 @@ export const Login = () => {
         password: "",
     });
 
-    const onFormSubmit = async (e: { preventDefault: () => void; }) => {
+    const [loginError, setLoginError] = useState({text: "", duration: 0});
+
+    const submit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const loginResponse = await login(formState).unwrap();
-        dispatch(setToken(loginResponse.token));
-        dispatch(setRefreshToken(loginResponse["refresh-token"]));
-        dispatch(setRole(loginResponse.role))
+        try {
+            const loginResponse = await login(formState).unwrap();
+            dispatch(setToken(loginResponse.token));
+            dispatch(setRefreshToken(loginResponse["refresh-token"]));
+            dispatch(setRole(loginResponse.role));
+            navigate("/events");
+        } catch (error) {
+            setLoginError({text: "Invalid username or password. Please try again.", duration: 3000});
+            setFormState((prev) => ({...prev, password: ""}))
+        }
 
-        navigate("/events");
     };
 
     return (
         <div className="w-96 bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
             <h1 className="text-3xl text-center font-bold mb-6">Login</h1>
-            <form>
+            {loginError.text && (
+                <p className="text-red-500 text-lg mb-4">
+                    {loginError.text}
+                </p>
+            )}
+            <form onSubmit={submit}>
                 <label className="block text-lg mb-4">Username</label>
                 <input
                     type="text"
@@ -49,7 +61,6 @@ export const Login = () => {
                 />
                 <button
                     className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-6"
-                    onClick={onFormSubmit}
                 >
                     Submit
                 </button>
