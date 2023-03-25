@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  run-linters:
+  build:
     name: Run build for web
     runs-on: ubuntu-latest
     defaults:
@@ -30,3 +30,26 @@ jobs:
 
       - name: Run build
         run: npm run build
+
+  run-linters:
+    name: Run linters for web
+    runs-on: ubuntu-latest
+    needs: [build]
+    defaults:
+      run:
+        working-directory: ./web
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 17
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
