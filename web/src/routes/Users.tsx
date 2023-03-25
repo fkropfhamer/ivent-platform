@@ -1,49 +1,48 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from 'react'
 import {
-    useChangeUserRoleByAdminMutation,
-    useDeleteUserByAdminMutation,
-    useFetchUsersQuery,
-    User
-} from "../services/api";
-import {Link} from "react-router-dom";
-import UserRole from "../constants/roles"
+  useChangeUserRoleByAdminMutation,
+  useDeleteUserByAdminMutation,
+  useFetchUsersQuery,
+  type User
+} from '../services/api'
+import { Link } from 'react-router-dom'
+import UserRole from '../constants/roles'
 
-export const Users = () => {
-    const [page, setPage] = useState(0)
-    const [users, setUsers] = useState<User[]>([])
-    const {data, isFetching} = useFetchUsersQuery(page);
-    const [deleteUserByAdmin, _] = useDeleteUserByAdminMutation()
-    const [changeUserRoleByAdmin, __] = useChangeUserRoleByAdminMutation()
+export const Users = (): JSX.Element => {
+  const [page, _setPage] = useState(0)
+  const [users, setUsers] = useState<User[]>([])
+  const { data, isFetching } = useFetchUsersQuery(page)
+  const [deleteUserByAdmin, _] = useDeleteUserByAdminMutation()
+  const [changeUserRoleByAdmin, __] = useChangeUserRoleByAdminMutation()
 
-    useEffect(() => {
-        if (!data) {
-            return
-        }
-
-        if (data.users.length) {
-            setUsers([...users, ...data.users]);
-
-            console.log(data.users)
-        } else if (page > 1) {
-        }
-    }, [data]);
-
-    if (isFetching) {
-        return <div>Loading</div>
+  useEffect(() => {
+    if (data == null) {
+      return
     }
 
-    function handleRoleChange(id: string, newRole: string) {
-        changeUserRoleByAdmin({
-            id: id,
-            newRole: newRole,
-        })
-    }
+    if (data.users.length > 0) {
+      setUsers([...users, ...data.users])
 
-    function handleDeleteUser(id: string) {
-        deleteUserByAdmin(id)
+      console.log(data.users)
     }
+  }, [data])
 
-    return (
+  if (isFetching) {
+    return <div>Loading</div>
+  }
+
+  const handleRoleChange = async (id: string, newRole: string): Promise<void> => {
+    await changeUserRoleByAdmin({
+      id,
+      newRole
+    })
+  }
+
+  const handleDeleteUser = async (id: string): Promise<void> => {
+    await deleteUserByAdmin(id)
+  }
+
+  return (
         <div className="w-full bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200 relative">
             <h1 className="text-3xl text-center font-bold mb-6">Users</h1>
             <div className="relative top-0 md:absolute md:top-8 right-4 mt-2 mr-4">
@@ -61,13 +60,13 @@ export const Users = () => {
                     <div className="px-4 py-2 flex justify-end">
                         <button
                             className="text-red-500 hover:text-red-700 font-medium mr-4"
-                            onClick={() => handleDeleteUser(user.id)}>
+                            onClick={() => { void handleDeleteUser(user.id) }}>
                             Delete
                         </button>
                         <select
                             className="border border-gray-300 rounded-md px-3 py-1"
                             value={user.role}
-                            onChange={(e) => handleRoleChange(user.id, e.target.value)}>
+                            onChange={(e) => { void handleRoleChange(user.id, e.target.value) }}>
                             <option value={`${UserRole.ROLE_USER}`}>User</option>
                             <option value={`${UserRole.ROLE_ADMIN}`}>Admin</option>
                         </select>
@@ -87,5 +86,5 @@ export const Users = () => {
       `}
             </style>
         </div>
-    )
+  )
 }
