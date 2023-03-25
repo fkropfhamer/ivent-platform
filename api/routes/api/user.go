@@ -84,6 +84,16 @@ type createUserByAdminRequestBody struct {
 }
 
 func CreateUserByAdminHandle(c *gin.Context) {
+	_, err := Authenticate(c, models.RoleAdmin)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "error with id: ${id}",
+		})
+
+		return
+	}
+
 	var body createUserByAdminRequestBody
 
 	if err := c.BindJSON(&body); err != nil {
@@ -99,7 +109,7 @@ func CreateUserByAdminHandle(c *gin.Context) {
 		Role: body.Role,
 	}
 
-	err := models.CreateUser(&newUser)
+	err = models.CreateUser(&newUser)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -119,6 +129,16 @@ type changeUserByAdminRequestBody struct {
 }
 
 func ChangeUserRoleByAdminHandle(c *gin.Context) {
+	_, err := Authenticate(c, models.RoleAdmin)
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "error with id: ${id}",
+		})
+
+		return
+	}
+
 	var body changeUserByAdminRequestBody
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
