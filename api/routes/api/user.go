@@ -52,7 +52,7 @@ func CreateUserHandle(c *gin.Context) {
 	var body createUserRequestBody
 
 	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
 		return
@@ -66,7 +66,7 @@ func CreateUserHandle(c *gin.Context) {
 	err := models.CreateUser(&newUser)
 
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
 		return
@@ -87,7 +87,7 @@ func CreateUserByAdminHandle(c *gin.Context) {
 	var body createUserByAdminRequestBody
 
 	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
 		return
@@ -102,7 +102,7 @@ func CreateUserByAdminHandle(c *gin.Context) {
 	err := models.CreateUser(&newUser)
 
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
 		return
@@ -121,7 +121,7 @@ type changeUserByAdminRequestBody struct {
 func ChangeUserRoleByAdminHandle(c *gin.Context) {
 	var body changeUserByAdminRequestBody
 	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "invalid body",
 		})
 
