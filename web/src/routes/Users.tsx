@@ -6,6 +6,7 @@ import {
     User
 } from "../services/api";
 import {Link} from "react-router-dom";
+import UserRole from "../constants/roles"
 
 export const Users = () => {
     const [page, setPage] = useState(0)
@@ -36,12 +37,10 @@ export const Users = () => {
             id: id,
             newRole: newRole,
         })
-        window.location.reload()
     }
 
     function handleDeleteUser(id: string) {
         deleteUserByAdmin(id)
-        window.location.reload()
     }
 
     return (
@@ -69,8 +68,8 @@ export const Users = () => {
                             className="border border-gray-300 rounded-md px-3 py-1"
                             value={user.role}
                             onChange={(e) => handleRoleChange(user.id, e.target.value)}>
-                            <option value="ROLE_ADMIN">Admin</option>
-                            <option value="ROLE_USER">User</option>
+                            <option value={`${UserRole.ROLE_USER}`}>User</option>
+                            <option value={`${UserRole.ROLE_ADMIN}`}>Admin</option>
                         </select>
                     </div>
                 </div>

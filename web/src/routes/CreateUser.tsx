@@ -1,12 +1,13 @@
 import {useState} from "react"
 import {Link, useNavigate} from "react-router-dom";
 import {useCreateUserByAdminMutation} from "../services/api";
+import UserRole from "../constants/roles";
 
 export const CreateUser = () => {
     const [formState, setFormState] = useState({
         username: "",
         password: "",
-        role: "ROLE_USER",
+        role: UserRole.ROLE_USER,
     });
     const [create, _] = useCreateUserByAdminMutation()
     const navigate = useNavigate()
@@ -22,7 +23,6 @@ export const CreateUser = () => {
         })
 
         navigate("/users")
-        window.location.reload()
     }
 
     return (
@@ -50,11 +50,11 @@ export const CreateUser = () => {
                     className="w-full px-4 py-2 rounded-lg text-lg mb-6 border-2 border-gray-300"
                     value={formState.role}
                     onChange={(e) =>
-                        setFormState((prev) => ({ ...prev, role: e.target.value }))
+                        setFormState((prev) => ({ ...prev, role: e.target.value as UserRole}))
                     }
                 >
-                    <option value="ROLE_USER">User</option>
-                    <option value="ROLE_ADMIN">Admin</option>
+                    <option value={`${UserRole.ROLE_USER}`}>User</option>
+                    <option value={`${UserRole.ROLE_ADMIN}`}>Admin</option>
                 </select>
                 <button
                     type="submit"
