@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from scraper.api_client import ApiClient
 from scraper.models.event import Event
 
 # Create a new instance of the Chrome driver
@@ -24,22 +25,27 @@ soup = BeautifulSoup(driver.page_source, "html.parser")
 
 events = []
 
+api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjEyMzQsImlkIjoiNjQxOTk4ZjJmMmJmOTExOGIxY2Y2ODZhIiwicm9sZSI6IlJPTEVfU0VSVklDRSJ9.9bILzNjF1D0v0giNqBwhwcqU9aWEBiVuvHq8E7eHD00"
+api_client = ApiClient(api_key)
+
 activity_groups = soup.find_all('div', class_='activity-group')
 for group in activity_groups:
     group_rows = group.find_all('div', class_='activity-list__row')
     for group_row in group_rows:
-        name = group.find('h3').text.strip()
+        name = group_row.find('h3').text.strip()
         date = group_row['data-date']
-        location_text = group.find('div', class_='activity-list__text').find('span').text
+        location_text = group_row.find('div', class_='activity-list__text').find('span').text
         location = location_text.split("|")[1].strip()
 
-        price_info = group.find('p', class_='activity-list-price-info').find('span').text.strip().replace("\n", "")
+        price_info = group_row.find('p', class_='activity-list-price-info').find('span').text.strip().replace("\n", "")
         organizer = "Bayerische Staatsoper"
-        link = "https://www.staatsoper.de" + group.find('a', class_='activity-list__content')['href']
+        link = "https://www.staatsoper.de" + group_row.find('a', class_='activity-list__content')['href']
 
         event = Event(name=name, date=date, location=location, price_info=price_info, organizer=organizer, link=link)
         print(event)
         events.append(event)
+
+        api_client.create_event(name)
 
 # Close the browser
 driver.quit()
