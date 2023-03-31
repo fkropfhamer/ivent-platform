@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -23,29 +24,38 @@ consent_banner = wait.until(EC.invisibility_of_element_located((By.ID, "cookie-c
 # Parse the HTML with BeautifulSoup
 soup = BeautifulSoup(driver.page_source, "html.parser")
 
-events = []
-
 api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjEyMzQsImlkIjoiNjQxOTk4ZjJmMmJmOTExOGIxY2Y2ODZhIiwicm9sZSI6IlJPTEVfU0VSVklDRSJ9.9bILzNjF1D0v0giNqBwhwcqU9aWEBiVuvHq8E7eHD00"
 api_client = ApiClient(api_key)
 
-activity_groups = soup.find_all('div', class_='activity-group')
-for group in activity_groups:
-    group_rows = group.find_all('div', class_='activity-list__row')
-    for group_row in group_rows:
-        name = group_row.find('h3').text.strip()
-        date = group_row['data-date']
-        location_text = group_row.find('div', class_='activity-list__text').find('span').text
-        location = location_text.split("|")[1].strip()
+events = []
 
-        price_info = group_row.find('p', class_='activity-list-price-info').find('span').text.strip().replace("\n", "")
-        organizer = "Bayerische Staatsoper"
-        link = "https://www.staatsoper.de" + group_row.find('a', class_='activity-list__content')['href']
+# Scrape events from current month's page and the next 11 months
+current_month = datetime.now().date().replace(day=1)
+for i in range(12):
+    month_url = current_month.strftime("https://www.staatsoper.de/spielplan/%Y-%m")
+    driver.get(month_url)
+    soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        event = Event(name=name, date=date, location=location, price_info=price_info, organizer=organizer, link=link)
-        print(event)
-        events.append(event)
+    activity_groups = soup.find_all('div', class_='activity-group')
+    for group in activity_groups:
+        group_rows = group.find_all('div', class_='activity-list__row')
+        for group_row in group_rows:
+            name = group_row.find('h3').text.strip()
+            date = group_row['data-date']
+            location_text = group_row.find('div', class_='activity-list__text').find('span').text
+            location = location_text.split("|")[1].strip()
 
-        api_client.create_event(name)
+            price_info = group_row.find('p', class_='activity-list-price-info').find('span').text.strip().replace("\n", "")
+            organizer = "Bayerische Staatsoper"
+            link = "https://www.staatsoper.de" + group_row.find('a', class_='activity-list__content')['href']
+
+            event = Event(name=name, date=date, location=location, price_info=price_info, organizer=organizer, link=link)
+            print(event)
+            events.append(event)
+
+            api_client.create_event(name)
+
+    current_month += timedelta(days=30)
 
 # Close the browser
 driver.quit()
