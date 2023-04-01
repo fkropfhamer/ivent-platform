@@ -1,1 +1,1 @@
-*/1 * * * * sh "/opt/run-scraper.sh"
+20 4 * * * /opt/run-scraper.sh
