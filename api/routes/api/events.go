@@ -6,13 +6,14 @@ import (
 	"ivent-api/models"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type createEventRequestBody struct {
 	Name      string
-	Date      primitive.DateTime
+	Date      string
 	Location  string
-	PriceInfo string
+	PriceInfo string `bson:"price_info" json:"price_info"`
 	Organizer string
 	Link      string
 }
@@ -45,10 +46,19 @@ func CreateEventHandler(c *gin.Context) {
 		return
 	}
 
+	dateTime, err := time.Parse("2006-01-02", body.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid date format",
+		})
+
+		return
+	}
+
 	event := models.Event{
 		ID:        primitive.NewObjectID(),
 		Name:      body.Name,
-		Date:      body.Date,
+		Date:      primitive.NewDateTimeFromTime(dateTime),
 		Location:  body.Location,
 		PriceInfo: body.PriceInfo,
 		Organizer: body.Organizer,

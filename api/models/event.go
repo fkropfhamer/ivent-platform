@@ -17,7 +17,7 @@ type Event struct {
 	Name      string             `json:"name"`
 	Date      primitive.DateTime
 	Location  string
-	PriceInfo string
+	PriceInfo string `bson:"price_info" json:"price_info"`
 	Organizer string
 	Link      string
 	Creator   primitive.ObjectID
