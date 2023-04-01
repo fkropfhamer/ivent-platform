@@ -1,4 +1,7 @@
+import json
+
 import requests
+
 
 class ApiClient:
     def __init__(self, api_key, base_url="http://localhost:8080/api") -> None:
@@ -7,16 +10,15 @@ class ApiClient:
 
     def prepare_headers(self):
         return {
-            'Content-Type':'application/json',
+            'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.api_key}'
         }
 
-    def create_event(self, name):
-        json = {
-            "name": name
-        }
+    def create_event(self, event):
+        event_dict = {"name": event.name, "date": event.date, "location": event.location,
+                      "price_info": event.price_info, "organizer": event.organizer, "link": event.link}
 
-        response = requests.post(f"{self.base_url}/events", headers=self.prepare_headers(), json=json).json()
+        response = requests.post(f"{self.base_url}/events", headers=self.prepare_headers(), json=event_dict).json()
 
         return response
 
@@ -24,7 +26,6 @@ class ApiClient:
         response = requests.get(f"{self.base_url}/events?page={page}", headers=self.prepare_headers()).json()
 
         return response["events"]
-    
 
     def get_all_events(self):
         page = 0
@@ -40,5 +41,3 @@ class ApiClient:
             events = [*events, *next_events]
 
         return events
-
-

@@ -53,7 +53,7 @@ for i in range(12):
             print(event)
             events.append(event)
 
-            api_client.create_event(name)
+            api_client.create_event(event)
 
     current_month += timedelta(days=30)
 

@@ -1,16 +1,21 @@
 package api
 
 import (
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ivent-api/models"
 	"net/http"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 type createEventRequestBody struct {
-	Name string
+	Name      string
+	Date      string
+	Location  string
+	PriceInfo string `bson:"price_info" json:"price_info"`
+	Organizer string
+	Link      string
 }
 
 func CreateEventHandler(c *gin.Context) {
@@ -41,10 +46,24 @@ func CreateEventHandler(c *gin.Context) {
 		return
 	}
 
+	dateTime, err := time.Parse("2006-01-02", body.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid date format",
+		})
+
+		return
+	}
+
 	event := models.Event{
-		ID:      primitive.NewObjectID(),
-		Name:    body.Name,
-		Creator: *userId,
+		ID:        primitive.NewObjectID(),
+		Name:      body.Name,
+		Date:      primitive.NewDateTimeFromTime(dateTime),
+		Location:  body.Location,
+		PriceInfo: body.PriceInfo,
+		Organizer: body.Organizer,
+		Link:      body.Link,
+		Creator:   *userId,
 	}
 
 	id, err := models.CreateEvent(&event)

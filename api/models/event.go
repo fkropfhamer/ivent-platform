@@ -13,9 +13,14 @@ import (
 )
 
 type Event struct {
-	ID      primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name    string             `json:"name"`
-	Creator primitive.ObjectID
+	ID        primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	Name      string             `json:"name"`
+	Date      primitive.DateTime
+	Location  string
+	PriceInfo string `bson:"price_info" json:"price_info"`
+	Organizer string
+	Link      string
+	Creator   primitive.ObjectID
 }
 
 func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
