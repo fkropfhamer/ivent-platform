@@ -32,3 +32,16 @@ COPY --from=web_stage --link /srv/app/dist public/
 COPY --link docker/caddy/Caddyfile /etc/caddy/Caddyfile
 
 
+FROM python:3.10-alpine as app_scraper
+
+WORKDIR /srv/app
+COPY --link ./scraper .
+
+RUN pip install -r requirements.txt
+
+ADD docker/cron/run-scraper.sh /opt/run-scraper.sh
+ADD docker/cron/crontab /etc/cron.d/cron-file
+RUN chmod 0644 /etc/cron.d/cron-file
+RUN crontab /etc/cron.d/cron-file
+
+CMD ["crond", "-f"]
