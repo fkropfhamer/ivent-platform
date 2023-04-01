@@ -30,7 +30,7 @@ def run(scraper_name, dry_run=False, debug=False):
     }
 
     if scraper_name == 'all':
-        logging.INFO
+        logging.info("running all scrapers")
         for scraper in scrapers.values():
             scraper(api_client, dry_run=dry_run)
 

@@ -5,7 +5,7 @@ import logging
 
 def scrape_lmu_cs(api_client, dry_run=False):
     logger = logging.getLogger(__name__)
-    logger.info("start scrapping lmu-cs")
+    logger.info("start scraping lmu-cs")
 
     r = requests.get(
         "https://www.lmu.de/de/workspace-fuer-studierende/career-service/career-community-events/career-und-networking-events/index.html")

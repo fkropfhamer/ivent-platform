@@ -11,7 +11,7 @@ from models.event import Event
 
 def scrape_staatsoper(api_client, dry_run=False):
     logger = logging.getLogger(__name__)
-    logger.info("Start scrapping staatsoper")
+    logger.info("start scraping staatsoper")
 
     # Create a new instance of the Chrome driver
     options = webdriver.FirefoxOptions()
@@ -24,10 +24,7 @@ def scrape_staatsoper(api_client, dry_run=False):
 
     # Wait for the page to load and for the cookie consent banner to disappear
     wait = WebDriverWait(driver, 10)
-    consent_banner = wait.until(EC.invisibility_of_element_located((By.ID, "cookie-consent")))
-
-    # Parse the HTML with BeautifulSoup
-    soup = BeautifulSoup(driver.page_source, "html.parser")
+    wait.until(EC.invisibility_of_element_located((By.ID, "cookie-consent")))
 
     events = []
 
@@ -63,4 +60,5 @@ def scrape_staatsoper(api_client, dry_run=False):
     # Close the browser
     driver.quit()
 
+    logger.info(f"scraped {len(events)} events")
     logger.info("finished scrapping staatsoper")
