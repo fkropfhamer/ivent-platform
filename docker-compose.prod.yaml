@@ -56,6 +56,14 @@ services:
     environment:
       SERVER_NAME: ${SERVER_NAME:-localhost}
 
+  scraper:
+    restart: unless-stopped
+    build:
+      context: .
+      target: app_scraper
+    depends_on:
+      - api
+
 volumes:
   db-data:
   db-log:
