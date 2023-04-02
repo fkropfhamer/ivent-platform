@@ -138,6 +138,46 @@ func DeleteEventHandler(c *gin.Context) {
 	})
 }
 
+func UnMarkEventHandler(c *gin.Context) {
+	user, err := Authenticate(c, models.RoleService)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "forbidden",
+		})
+
+		return
+	}
+
+	eventId, err := primitive.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid eventid",
+		})
+
+		return
+	}
+
+	if user.MarkedEvents == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "event unmarked",
+		})
+	}
+
+	update := bson.M{"$pull": bson.M{"markedevents": eventId}}
+	err = models.UpdateUser(&user.Id, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "unmarking failed",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "event unmarked",
+	})
+}
+
 func MarkEventHandler(c *gin.Context) {
 	user, err := Authenticate(c, models.RoleService)
 	if err != nil {
