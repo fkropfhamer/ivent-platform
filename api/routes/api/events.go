@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -89,7 +90,7 @@ func ListEventsHandler(c *gin.Context) {
 		page = 0
 	}
 
-	events, count, err := models.GetEvents(page)
+	events, count, err := models.GetEvents(page, nil)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -215,5 +216,52 @@ func MarkEventHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "event marked",
+	})
+}
+
+func GetMarkedEventsHandler(c *gin.Context) {
+	user, err := Authenticate(c, models.RoleService)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "forbidden",
+		})
+
+		return
+	}
+
+	if user.MarkedEvents == nil || len(user.MarkedEvents) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"events": []primitive.ObjectID{},
+		})
+
+		return
+	}
+
+	pageString := c.DefaultQuery("page", "0")
+	page, err := strconv.ParseInt(pageString, 10, 0)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "bad query param page",
+		})
+
+		return
+	}
+
+	fmt.Println(page)
+
+	events, total, err := models.GetEvents(page, &user.MarkedEvents)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "error",
+		})
+
+		fmt.Println(err)
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"events": events,
+		"total":  total,
 	})
 }

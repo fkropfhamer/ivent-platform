@@ -42,10 +42,13 @@ func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
 	return nil, errors.New("invalid id")
 }
 
-func GetEvents(page int64) ([]Event, int64, error) {
+func GetEvents(page int64, ids *[]primitive.ObjectID) ([]Event, int64, error) {
 	pageLimit := int64(15)
 	skip := page * pageLimit
-	filter := bson.D{}
+	filter := bson.M{}
+	if ids != nil {
+		filter = bson.M{"_id": bson.M{"$in": ids}}
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
