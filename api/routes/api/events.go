@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ivent-api/models"
 	"net/http"
@@ -19,7 +20,7 @@ type createEventRequestBody struct {
 }
 
 func CreateEventHandler(c *gin.Context) {
-	userId, err := Authenticate(c, models.RoleService)
+	user, err := Authenticate(c, models.RoleService)
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -63,7 +64,7 @@ func CreateEventHandler(c *gin.Context) {
 		PriceInfo: body.PriceInfo,
 		Organizer: body.Organizer,
 		Link:      body.Link,
-		Creator:   *userId,
+		Creator:   user.Id,
 	}
 
 	id, err := models.CreateEvent(&event)
@@ -134,5 +135,45 @@ func DeleteEventHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "event deleted",
+	})
+}
+
+func MarkEventHandler(c *gin.Context) {
+	user, err := Authenticate(c, models.RoleService)
+	if err != nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "forbidden",
+		})
+
+		return
+	}
+
+	eventId := c.Param("id")
+
+	event, err := models.GetEvent(eventId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "event not found",
+		})
+
+		return
+	}
+
+	update := bson.M{"$addToSet": bson.M{"markedevents": event.ID}}
+	if user.MarkedEvents == nil {
+		update = bson.M{"$set": bson.M{"markedevents": []primitive.ObjectID{event.ID}}}
+	}
+
+	err = models.UpdateUser(&user.Id, update)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "marking failed",
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "event marked",
 	})
 }

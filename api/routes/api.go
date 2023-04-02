@@ -42,6 +42,7 @@ func NewRouter(handler *gin.Engine) {
 			eventRouter.GET("/:id", api.GetEventHandler)
 			eventRouter.DELETE("/:id", api.DeleteEventHandler)
 			eventRouter.GET("", api.ListEventsHandler)
+			eventRouter.PUT("/:id/mark", api.MarkEventHandler)
 		}
 	}
 }
