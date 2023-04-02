@@ -74,7 +74,7 @@ export const apiSlice = createApi({
       }),
       event: builder.query<Event, string>({ query: (id) => `events/${id}` }),
       createEvent: builder.mutation({ query: (event) => ({ url: 'events', method: 'POST', body: event }) }),
-      fetchEvents: builder.query<{ events: [Event], page: number, count: number }, number>({ query: (page) => `events?page=${page}` }),
+      fetchEvents: builder.query<{ events: Event[], page: number, count: number }, number>({ query: (page) => `events?page=${page}` }),
       createUserByAdmin: builder.mutation({ query: (user) => ({ url: 'users/create', method: 'POST', body: user }) }),
       deleteUserByAdmin: builder.mutation<void, string>({
         query: (id) => ({
@@ -83,7 +83,7 @@ export const apiSlice = createApi({
         })
       }),
       changeUserRoleByAdmin: builder.mutation({ query: (change) => ({ url: 'users/change-role', method: 'PUT', body: change }) }),
-      fetchUsers: builder.query<{ users: [User], page: number, count: number }, number>({ query: (page) => `users?page=${page}` }),
+      fetchUsers: builder.query<{ users: User[], page: number, count: number }, number>({ query: (page) => `users?page=${page}` }),
       registerUser: builder.mutation({
         query: (credentials) => ({
           url: 'users/register',
@@ -102,8 +102,8 @@ export const apiSlice = createApi({
       }),
       createServiceAccount: builder.mutation<{ token: string }, { name: string }>({ query: (body) => ({ url: 'users/service', method: 'POST', body }) }),
       markEvent: builder.mutation<void, string>({ query: (id) => ({ url: `events/${id}/mark`, method: 'PUT' }) }),
-      unmarkEvent: builder.mutation<void, string>({ query: (id) => ({ url: `event/${id}/unmark`, method: 'PUT' }) }),
-      fetchMarkedEvents: builder.query<{ events: [Event], page: number, total: number }, number>({ query: (page) => ({ url: 'events/marked', params: { page } }) })
+      unmarkEvent: builder.mutation<void, string>({ query: (id) => ({ url: `events/${id}/unmark`, method: 'PUT' }) }),
+      fetchMarkedEvents: builder.query<{ events: Event[], page: number, total: number }, number>({ query: (page) => ({ url: 'events/marked', params: { page } }) })
     }
   }
 })
@@ -121,5 +121,8 @@ export const {
   useDeleteUserByAdminMutation,
   useChangeUserRoleByAdminMutation,
   useChangePasswordMutation,
-  useCreateServiceAccountMutation
+  useCreateServiceAccountMutation,
+  useMarkEventMutation,
+  useFetchMarkedEventsQuery,
+  useUnmarkEventMutation
 } = apiSlice

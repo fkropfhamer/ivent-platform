@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
 import { type Event, useFetchEventsQuery } from '../services/api'
 import { useEffect, useState } from 'react'
+import { EventList } from '../components/EventList'
 
 export const Events = (): JSX.Element => {
   const [page, setPage] = useState(0)
@@ -29,14 +29,7 @@ export const Events = (): JSX.Element => {
   return (
         <div className="w-full bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
             <h1 className="text-3xl text-center font-bold mb-6">Events</h1>
-            {events.map(event => (
-                <div key={event.id}
-                     className="h-52 py-1 my-5 bg-gray-200 rounded-lg text-center border border-gray-300 flex justify-center items-center">
-                    <Link to={event.id} className="text-green-500 hover:underline p-2">
-                        {event.name}
-                    </Link>
-                </div>
-            ))}
+            <EventList events={events} />
             {showMore
               ? (
                 <button
