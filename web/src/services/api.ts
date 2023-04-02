@@ -100,7 +100,10 @@ export const apiSlice = createApi({
           body
         })
       }),
-      createServiceAccount: builder.mutation<{ token: string }, { name: string }>({ query: (body) => ({ url: 'users/service', method: 'POST', body }) })
+      createServiceAccount: builder.mutation<{ token: string }, { name: string }>({ query: (body) => ({ url: 'users/service', method: 'POST', body }) }),
+      markEvent: builder.mutation<void, string>({ query: (id) => ({ url: `events/${id}/mark`, method: 'PUT' }) }),
+      unmarkEvent: builder.mutation<void, string>({ query: (id) => ({ url: `event/${id}/unmark`, method: 'PUT' }) }),
+      fetchMarkedEvents: builder.query<{ events: [Event], page: number, total: number }, number>({ query: (page) => ({ url: 'events/marked', params: { page } }) })
     }
   }
 })
