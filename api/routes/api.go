@@ -44,7 +44,6 @@ func NewRouter(handler *gin.Engine) {
 			eventRouter.GET("", api.ListEventsHandler)
 			eventRouter.PUT("/:id/mark", api.MarkEventHandler)
 			eventRouter.PUT("/:id/unmark", api.UnMarkEventHandler)
-			eventRouter.GET("/marked", api.GetMarkedEventsHandler)
 		}
 	}
 }
