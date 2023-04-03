@@ -42,12 +42,37 @@ func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
 	return nil, errors.New("invalid id")
 }
 
-func GetEvents(page int64, ids *[]primitive.ObjectID) ([]Event, int64, error) {
+type ResponseEvent struct {
+	ID        primitive.ObjectID `json:"id,omitempty"`
+	Name      string             `json:"name"`
+	Date      primitive.DateTime
+	Location  string
+	PriceInfo string `json:"price_info"`
+	Organizer string
+	Link      string
+	Creator   primitive.ObjectID
+	IsMarked  bool `json:"is_marked" binding:"required"`
+}
+
+func fromEvent(event *Event) ResponseEvent {
+	return ResponseEvent{
+		ID:        event.ID,
+		Name:      event.Name,
+		Date:      event.Date,
+		Location:  event.Location,
+		PriceInfo: event.PriceInfo,
+		Organizer: event.Organizer,
+		Link:      event.Link,
+		Creator:   event.Creator,
+		IsMarked:  false,
+	}
+}
+
+func GetEvents(page int64, filter bson.M) ([]Event, int64, error) {
 	pageLimit := int64(15)
 	skip := page * pageLimit
-	filter := bson.M{}
-	if ids != nil {
-		filter = bson.M{"_id": bson.M{"$in": ids}}
+	if filter == nil {
+		filter = bson.M{}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -81,6 +106,30 @@ func GetEvents(page int64, ids *[]primitive.ObjectID) ([]Event, int64, error) {
 	}
 
 	return results, count, nil
+}
+
+func MapEventsToResponseEvents(events *[]Event, markedIds *[]primitive.ObjectID) *[]ResponseEvent {
+	responseResults := make([]ResponseEvent, len(*events))
+
+	if markedIds != nil {
+		idMap := make(map[primitive.ObjectID]bool)
+		for _, id := range *markedIds {
+			idMap[id] = true
+		}
+
+		for i, result := range *events {
+			responseResults[i] = fromEvent(&result)
+			responseResults[i].IsMarked = idMap[result.ID]
+		}
+
+		return &responseResults
+	}
+
+	for i, result := range *events {
+		responseResults[i] = fromEvent(&result)
+	}
+
+	return &responseResults
 }
 
 func GetEvent(id string) (*Event, error) {

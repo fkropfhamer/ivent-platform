@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -84,13 +83,21 @@ func CreateEventHandler(c *gin.Context) {
 }
 
 func ListEventsHandler(c *gin.Context) {
+	user, _ := Authenticate(c, models.RoleUser)
+
 	pageParam := c.Query("page")
 	page, err := strconv.ParseInt(pageParam, 10, 64)
 	if err != nil {
 		page = 0
 	}
 
-	events, count, err := models.GetEvents(page, nil)
+	filter := bson.M{}
+	markedParam := c.Query("marked")
+	if markedParam != "" {
+		filter = bson.M{"_id": bson.M{"$in": &user.MarkedEvents}}
+	}
+
+	events, count, err := models.GetEvents(page, filter)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -100,8 +107,19 @@ func ListEventsHandler(c *gin.Context) {
 		return
 	}
 
+	if user == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"events": events,
+			"count":  count,
+			"page":   page,
+		})
+
+		return
+	}
+
+	responseEvents := models.MapEventsToResponseEvents(&events, &user.MarkedEvents)
 	c.JSON(http.StatusOK, gin.H{
-		"events": events,
+		"events": responseEvents,
 		"count":  count,
 		"page":   page,
 	})
@@ -140,9 +158,9 @@ func DeleteEventHandler(c *gin.Context) {
 }
 
 func UnMarkEventHandler(c *gin.Context) {
-	user, err := Authenticate(c, models.RoleService)
+	user, err := Authenticate(c, models.RoleUser)
 	if err != nil {
-		c.JSON(http.StatusForbidden, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "forbidden",
 		})
 
@@ -180,9 +198,9 @@ func UnMarkEventHandler(c *gin.Context) {
 }
 
 func MarkEventHandler(c *gin.Context) {
-	user, err := Authenticate(c, models.RoleService)
+	user, err := Authenticate(c, models.RoleUser)
 	if err != nil {
-		c.JSON(http.StatusForbidden, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "forbidden",
 		})
 
@@ -216,52 +234,5 @@ func MarkEventHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "event marked",
-	})
-}
-
-func GetMarkedEventsHandler(c *gin.Context) {
-	user, err := Authenticate(c, models.RoleService)
-	if err != nil {
-		c.JSON(http.StatusForbidden, gin.H{
-			"message": "forbidden",
-		})
-
-		return
-	}
-
-	if user.MarkedEvents == nil || len(user.MarkedEvents) == 0 {
-		c.JSON(http.StatusOK, gin.H{
-			"events": []primitive.ObjectID{},
-		})
-
-		return
-	}
-
-	pageString := c.DefaultQuery("page", "0")
-	page, err := strconv.ParseInt(pageString, 10, 0)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "bad query param page",
-		})
-
-		return
-	}
-
-	fmt.Println(page)
-
-	events, total, err := models.GetEvents(page, &user.MarkedEvents)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "error",
-		})
-
-		fmt.Println(err)
-
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"events": events,
-		"total":  total,
 	})
 }
