@@ -91,10 +91,23 @@ func ListEventsHandler(c *gin.Context) {
 		page = 0
 	}
 
-	filter := bson.M{}
+	var filter bson.M = nil
 	markedParam := c.Query("marked")
 	if markedParam != "" {
-		filter = bson.M{"_id": bson.M{"$in": &user.MarkedEvents}}
+		if user == nil {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"message": "query param marked requires authorization",
+			})
+
+			return
+		}
+
+		var eventList = &[]primitive.ObjectID{}
+		if &user.MarkedEvents != nil {
+			eventList = &user.MarkedEvents
+		}
+
+		filter = bson.M{"_id": bson.M{"$in": eventList}}
 	}
 
 	events, count, err := models.GetEvents(page, filter)

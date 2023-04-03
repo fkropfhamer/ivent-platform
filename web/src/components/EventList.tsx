@@ -27,7 +27,7 @@ const EventCard = ({ event }: { event: Event }): JSX.Element => {
 
 const MarkButton = ({ eventId }: { eventId: string }): JSX.Element => {
   const [isMarked, setIsMarked] = useState(false)
-  const text = isMarked ? 'unmark' : 'mark1'
+  const text = isMarked ? 'unmark' : 'mark'
   const [mark, _m] = useMarkEventMutation()
   const [unmark, _] = useUnmarkEventMutation()
 
