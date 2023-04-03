@@ -10,6 +10,7 @@ interface Profile {
 export interface Event {
   name: string
   id: string
+  is_marked: boolean
 }
 
 export interface User {

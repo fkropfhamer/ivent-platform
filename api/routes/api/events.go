@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -102,17 +103,24 @@ func ListEventsHandler(c *gin.Context) {
 			return
 		}
 
-		var eventList = &[]primitive.ObjectID{}
-		if &user.MarkedEvents != nil {
-			eventList = &user.MarkedEvents
+		if &user.MarkedEvents == nil || len(user.MarkedEvents) == 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"events": make([]models.Event, 0),
+				"count":  0,
+				"page":   page,
+			})
+
+			return
 		}
 
-		filter = bson.M{"_id": bson.M{"$in": eventList}}
+		filter = bson.M{"_id": bson.M{"$in": user.MarkedEvents}}
 	}
 
 	events, count, err := models.GetEvents(page, filter)
 
 	if err != nil {
+		fmt.Println(err)
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})

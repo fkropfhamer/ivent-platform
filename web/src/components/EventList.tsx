@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { type RootState } from '../app/store'
@@ -20,13 +19,12 @@ const EventCard = ({ event }: { event: Event }): JSX.Element => {
             <Link to={event.id} className="text-green-500 hover:underline p-2">
                 {event.name}
             </Link>
-            {isLoggedIn ? <MarkButton eventId={event.id}/> : null}
+            {isLoggedIn ? <MarkButton isMarked={event.is_marked} eventId={event.id}/> : null}
         </div>
     </>
 }
 
-const MarkButton = ({ eventId }: { eventId: string }): JSX.Element => {
-  const [isMarked, setIsMarked] = useState(false)
+const MarkButton = ({ eventId, isMarked }: { eventId: string, isMarked: boolean }): JSX.Element => {
   const text = isMarked ? 'unmark' : 'mark'
   const [mark, _m] = useMarkEventMutation()
   const [unmark, _] = useUnmarkEventMutation()
@@ -35,12 +33,10 @@ const MarkButton = ({ eventId }: { eventId: string }): JSX.Element => {
     if (isMarked) {
       await unmark(eventId)
 
-      setIsMarked(false)
       return
     }
 
     await mark(eventId)
-    setIsMarked(true)
   }
 
   return <button onClick={() => { void onClick() }}>

@@ -7,8 +7,6 @@ function Index (): JSX.Element {
   const isLoggedIn = useSelector((state: RootState) => state.auth.refreshToken !== null)
   const { data = { count: 0 }, isFetching } = useFetchEventsQuery({ page: 0, marked: undefined })
 
-  console.log(data)
-
   return (
         <div className="w-96 bg-white rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
             <h1 className="text-3xl text-center font-bold underline mb-6">Welcome to the IVENT-Platform</h1>
