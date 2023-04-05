@@ -19,20 +19,19 @@ const EventCard = ({ event }: { event: Event }): JSX.Element => {
             <Link to={event.id} className="text-green-500 hover:underline p-2">
                 {event.name}
             </Link>
-            {isLoggedIn ? <MarkButton isMarked={event.is_marked} eventId={event.id}/> : null}
+            {isLoggedIn ? <MarkButton isMarked={event.is_marked} eventId={event.id} /> : null}
         </div>
     </>
 }
 
 const MarkButton = ({ eventId, isMarked }: { eventId: string, isMarked: boolean }): JSX.Element => {
   const text = isMarked ? 'unmark' : 'mark'
-  const [mark, _m] = useMarkEventMutation()
+  const [mark, _d] = useMarkEventMutation()
   const [unmark, _] = useUnmarkEventMutation()
 
   const onClick = async (): Promise<void> => {
     if (isMarked) {
       await unmark(eventId)
-
       return
     }
 
