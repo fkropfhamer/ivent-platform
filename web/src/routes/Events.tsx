@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { EventList } from '../components/EventList'
 import { useSelector } from 'react-redux'
 import { type RootState } from '../app/store'
+import { useSearchParams } from 'react-router-dom'
 
 interface Filters {
   isMarked: boolean
@@ -25,7 +26,8 @@ const EventsListPage = ({ page, filters }: { page: number, filters: Filters }): 
 }
 
 export const Events = (): JSX.Element => {
-  const [markedFilter, setMarkedFilter] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [markedFilter, setMarkedFilter] = useState(searchParams.get('marked') !== null)
   const filters = { isMarked: markedFilter }
   const [pages, setPages] = useState<JSX.Element[]>([<EventsListPage page={0} filters={filters} key={1}/>])
   const [page, setPage] = useState(0)
@@ -46,6 +48,13 @@ export const Events = (): JSX.Element => {
   const setFilter = async (): Promise<void> => {
     setMarkedFilter(!markedFilter)
     const filters = { isMarked: !markedFilter }
+
+    if (!markedFilter) {
+      setSearchParams({ marked: '1' })
+    } else {
+      setSearchParams({})
+    }
+
     setPages([<EventsListPage page={0} filters={filters} key={1}/>])
   }
 
