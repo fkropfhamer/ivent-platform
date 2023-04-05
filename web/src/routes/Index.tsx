@@ -5,9 +5,7 @@ import { type RootState } from '../app/store'
 
 function Index (): JSX.Element {
   const isLoggedIn = useSelector((state: RootState) => state.auth.refreshToken !== null)
-  const { data = { count: 0 }, isFetching } = useFetchEventsQuery(0)
-
-  console.log(data)
+  const { data = { count: 0 }, isFetching } = useFetchEventsQuery({ page: 0, marked: undefined })
 
   return (
         <div className="w-96 bg-white rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">

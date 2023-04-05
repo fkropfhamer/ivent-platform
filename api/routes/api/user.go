@@ -214,7 +214,7 @@ func RegisterHandle(c *gin.Context) {
 }
 
 func DeleteUserHandle(c *gin.Context) {
-	id, err := Authenticate(c, models.RoleUser)
+	user, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
@@ -223,7 +223,7 @@ func DeleteUserHandle(c *gin.Context) {
 		return
 	}
 
-	if err := models.DeleteUser(id); err != nil {
+	if err := models.DeleteUser(&user.Id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
@@ -231,7 +231,7 @@ func DeleteUserHandle(c *gin.Context) {
 		return
 	}
 
-	if err := models.DeleteAllRefreshTokenForUser(id); err != nil {
+	if err := models.DeleteAllRefreshTokenForUser(&user.Id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
@@ -273,7 +273,7 @@ type ChangePasswordRequestBody struct {
 }
 
 func ChangePasswordHandle(c *gin.Context) {
-	id, err := Authenticate(c, models.RoleUser)
+	user, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
@@ -291,7 +291,7 @@ func ChangePasswordHandle(c *gin.Context) {
 		return
 	}
 
-	if err := CheckPassword(id, body.CurrentPassword); err != nil {
+	if err := CheckPassword(&user.Id, body.CurrentPassword); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid password",
 		})
@@ -299,7 +299,7 @@ func ChangePasswordHandle(c *gin.Context) {
 		return
 	}
 
-	if err := models.UpdatePassword(id, body.NewPassword); err != nil {
+	if err := models.UpdatePassword(&user.Id, body.NewPassword); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})

@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"ivent-api/db"
@@ -14,11 +15,12 @@ import (
 )
 
 type User struct {
-	Id       primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name     string             `json:"name"`
-	Role     Role               `json:"role"`
-	Password string             `json:"-"`
-	Token    string             `json:"-"`
+	Id           primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	Name         string             `json:"name"`
+	Role         Role               `json:"role"`
+	Password     string             `json:"-"`
+	Token        string             `json:"-"`
+	MarkedEvents []primitive.ObjectID
 }
 
 type Role string
@@ -65,6 +67,8 @@ func UpdateUser(id *primitive.ObjectID, update interface{}) error {
 	defer cancel()
 	result, err := db.UserCollection.UpdateByID(ctx, id, update)
 	if err != nil || result.MatchedCount == 0 {
+		fmt.Println(err)
+
 		return errors.New("update failed")
 	}
 
