@@ -37,7 +37,7 @@ func createExampleEvents(testUser *models.User) {
 			Date:      primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, 7)),
 			Location:  "online",
 			PriceInfo: "free",
-			Organizer: "Fabian",
+			Organizer: "Organizer " + strconv.Itoa(i%3),
 			Link:      "https://example.com/",
 			Creator:   testUser.Id,
 		}
