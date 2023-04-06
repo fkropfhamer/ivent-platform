@@ -310,7 +310,24 @@ func ListUsersHandle(c *gin.Context) {
 		page = 0
 	}
 
-	users, count, err := models.GetUsers(page)
+	filter := bson.M{}
+
+	roleParam := c.Query("role")
+	if roleParam != "" {
+
+		role, err := models.RoleFromString(roleParam)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid role param",
+			})
+
+			return
+		}
+
+		filter["role"] = bson.M{"$eq": role}
+	}
+
+	users, count, err := models.GetUsers(page, filter)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
