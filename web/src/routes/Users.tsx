@@ -8,12 +8,12 @@ import { Link } from 'react-router-dom'
 import UserRole, { userRoleToDisplayString } from '../constants/roles'
 
 interface UserFilter {
-  role: UserRole
+  role: UserRole | undefined
 }
 
 export const Users = (): JSX.Element => {
   const [page, _setPage] = useState(0)
-  const [filter, setFilter] = useState<UserFilter>({ role: UserRole.User })
+  const [filter, setFilter] = useState<UserFilter>({ role: undefined })
   const { data, isFetching } = useFetchUsersQuery({ page, role: filter.role })
   const [deleteUserByAdmin, _] = useDeleteUserByAdminMutation()
   const [changeUserRoleByAdmin, __] = useChangeUserRoleByAdminMutation()
@@ -37,13 +37,20 @@ export const Users = (): JSX.Element => {
     await deleteUserByAdmin(id)
   }
 
-  const setRoleFilter = (role: UserRole): void => {
-    setFilter({ ...filter, role })
+  const setRoleFilter = (role: string): void => {
+    if (Object.values(UserRole).includes(role as UserRole)) {
+      setFilter({ ...filter, role: role as UserRole })
+
+      return
+    }
+
+    setFilter({ ...filter, role: undefined })
   }
 
   return (
         <div className="w-full bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200 relative">
-            <select value={filter.role} onChange={(e) => { setRoleFilter(e.target.value as UserRole) }}>
+            <select value={filter.role} onChange={(e) => { setRoleFilter(e.target.value) }}>
+              <option value={'All'}>All</option>
               {Object.values(UserRole).map(role => {
                 return <option key={role} value={role}>{userRoleToDisplayString(role)}</option>
               }) }
