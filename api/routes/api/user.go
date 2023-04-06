@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ivent-api/models"
 	"net/http"
@@ -310,7 +311,24 @@ func ListUsersHandle(c *gin.Context) {
 		page = 0
 	}
 
-	users, count, err := models.GetUsers(page)
+	filter := bson.M{}
+
+	roleParam := c.Query("role")
+	if roleParam != "" {
+
+		role, err := models.RoleFromString(roleParam)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid role param",
+			})
+
+			return
+		}
+
+		filter["role"] = bson.M{"$eq": role}
+	}
+
+	users, count, err := models.GetUsers(page, filter)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

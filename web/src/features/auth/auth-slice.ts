@@ -1,14 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import type UserRole from '../../constants/roles'
 
 interface AuthState {
   accessToken: string | null
   refreshToken: string | null
-  role: Role | null
-}
-
-export enum Role {
-  Admin = 'ROLE_ADMIN',
-  User = 'ROLE_USER',
+  role: UserRole | null
 }
 
 // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -20,7 +16,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setRole (state, action: PayloadAction<Role>) {
+    setRole (state, action: PayloadAction<UserRole>) {
       state.role = action.payload
     },
 

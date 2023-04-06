@@ -92,7 +92,12 @@ func ListEventsHandler(c *gin.Context) {
 		page = 0
 	}
 
-	var filter bson.M = nil
+	filter := bson.M{}
+	organizerParam := c.Query("organizer")
+	if organizerParam != "" {
+		filter["organizer"] = bson.M{"$in": []string{organizerParam}}
+	}
+
 	markedParam := c.Query("marked")
 	if markedParam != "" {
 		if user == nil {
@@ -113,7 +118,7 @@ func ListEventsHandler(c *gin.Context) {
 			return
 		}
 
-		filter = bson.M{"_id": bson.M{"$in": user.MarkedEvents}}
+		filter["_id"] = bson.M{"$in": user.MarkedEvents}
 	}
 
 	events, count, err := models.GetEvents(page, filter)
