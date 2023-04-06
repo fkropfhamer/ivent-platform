@@ -102,7 +102,9 @@ export const apiSlice = createApi({
         })
       }),
       changeUserRoleByAdmin: builder.mutation({ query: (change) => ({ url: 'users/change-role', method: 'PUT', body: change }) }),
-      fetchUsers: builder.query<{ users: User[], page: number, count: number }, number>({ query: (page) => `users?page=${page}` }),
+      fetchUsers: builder.query<{ users: User[], page: number, count: number }, { page: number, role: Role | undefined }>({
+        query: (params) => ({ url: 'users', params: { ...params } })
+      }),
       registerUser: builder.mutation({
         query: (credentials) => ({
           url: 'users/register',

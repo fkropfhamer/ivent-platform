@@ -11,7 +11,7 @@ import UserRole from '../constants/roles'
 export const Users = (): JSX.Element => {
   const [page, _setPage] = useState(0)
   const [users, setUsers] = useState<User[]>([])
-  const { data, isFetching } = useFetchUsersQuery(page)
+  const { data, isFetching } = useFetchUsersQuery({ page, role: undefined })
   const [deleteUserByAdmin, _] = useDeleteUserByAdminMutation()
   const [changeUserRoleByAdmin, __] = useChangeUserRoleByAdminMutation()
 
