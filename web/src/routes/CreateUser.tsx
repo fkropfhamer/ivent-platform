@@ -7,7 +7,7 @@ export const CreateUser = (): JSX.Element => {
   const [formState, setFormState] = useState({
     username: '',
     password: '',
-    role: UserRole.ROLE_USER
+    role: UserRole.User
   })
   const [create, _] = useCreateUserByAdminMutation()
   const navigate = useNavigate()
@@ -50,8 +50,8 @@ export const CreateUser = (): JSX.Element => {
                     onChange={(e) => { setFormState((prev) => ({ ...prev, role: e.target.value as UserRole })) }
                     }
                 >
-                    <option value={`${UserRole.ROLE_USER}`}>User</option>
-                    <option value={`${UserRole.ROLE_ADMIN}`}>Admin</option>
+                    <option value={`${UserRole.User}`}>User</option>
+                    <option value={`${UserRole.Admin}`}>Admin</option>
                 </select>
                 <button
                     type="submit"

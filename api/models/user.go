@@ -33,12 +33,12 @@ const (
 )
 
 func RoleFromString(role string) (Role, error) {
-	switch strings.ToLower(role) {
-	case "admin":
+	switch strings.ToUpper(role) {
+	case string(RoleAdmin):
 		return RoleAdmin, nil
-	case "user":
+	case string(RoleUser):
 		return RoleUser, nil
-	case "service":
+	case string(RoleService):
 		return RoleService, nil
 	default:
 		return "", errors.New("invalid role")

@@ -1,34 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   useChangeUserRoleByAdminMutation,
   useDeleteUserByAdminMutation,
-  useFetchUsersQuery,
-  type User
+  useFetchUsersQuery
 } from '../services/api'
 import { Link } from 'react-router-dom'
-import UserRole from '../constants/roles'
+import UserRole, { userRoleToDisplayString } from '../constants/roles'
+
+interface UserFilter {
+  role: UserRole
+}
 
 export const Users = (): JSX.Element => {
   const [page, _setPage] = useState(0)
-  const [users, setUsers] = useState<User[]>([])
-  const { data, isFetching } = useFetchUsersQuery({ page, role: undefined })
+  const [filter, setFilter] = useState<UserFilter>({ role: UserRole.User })
+  const { data, isFetching } = useFetchUsersQuery({ page, role: filter.role })
   const [deleteUserByAdmin, _] = useDeleteUserByAdminMutation()
   const [changeUserRoleByAdmin, __] = useChangeUserRoleByAdminMutation()
 
-  useEffect(() => {
-    if (data == null) {
-      return
-    }
-
-    if (data.users.length > 0) {
-      setUsers([...users, ...data.users])
-
-      console.log(data.users)
-    }
-  }, [data])
-
   if (isFetching) {
     return <div>Loading</div>
+  }
+
+  if (data == null) {
+    return <div>Error</div>
   }
 
   const handleRoleChange = async (id: string, newRole: string): Promise<void> => {
@@ -42,15 +37,24 @@ export const Users = (): JSX.Element => {
     await deleteUserByAdmin(id)
   }
 
+  const setRoleFilter = (role: UserRole): void => {
+    setFilter({ ...filter, role })
+  }
+
   return (
         <div className="w-full bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200 relative">
+            <select value={filter.role} onChange={(e) => { setRoleFilter(e.target.value as UserRole) }}>
+              {Object.values(UserRole).map(role => {
+                return <option key={role} value={role}>{userRoleToDisplayString(role)}</option>
+              }) }
+            </select>
             <h1 className="text-3xl text-center font-bold mb-6">Users</h1>
             <div className="relative top-0 md:absolute md:top-8 right-4 mt-2 mr-4">
                 <Link to="/users/create"
                       className="text-white bg-green-500 hover:bg-green-600 rounded-lg py-2 px-4 text-lg">Create
                     User</Link>
             </div>
-            {users.map(user => (
+            {data.users.map(user => (
                 <div key={user.id} className="py-1 my-5 bg-gray-200 rounded-lg border border-gray-300">
                     <div className="px-4 py-2 flex justify-between items-center">
                         <div className="font-bold text-lg">{user.name}</div>
@@ -67,8 +71,8 @@ export const Users = (): JSX.Element => {
                             className="border border-gray-300 rounded-md px-3 py-1"
                             value={user.role}
                             onChange={(e) => { void handleRoleChange(user.id, e.target.value) }}>
-                            <option value={`${UserRole.ROLE_USER}`}>User</option>
-                            <option value={`${UserRole.ROLE_ADMIN}`}>Admin</option>
+                            <option value={`${UserRole.User}`}>User</option>
+                            <option value={`${UserRole.Admin}`}>Admin</option>
                         </select>
                     </div>
                 </div>

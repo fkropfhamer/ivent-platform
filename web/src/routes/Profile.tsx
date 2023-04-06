@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useDeleteUserMutation, useProfileQuery } from '../services/api'
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, Role } from '../features/auth/auth-slice'
+import { logout } from '../features/auth/auth-slice'
 import { ChangePasswordForm } from '../components/ChangePasswordForm'
 import { type RootState } from '../app/store'
 import { CreateServiceAccountForm } from '../components/CreateServiceAccountForm'
+import UserRole from '../constants/roles'
 
 export const Profile = (): JSX.Element => {
   const { data: profile, error, isLoading } = useProfileQuery()
@@ -58,7 +59,7 @@ export const Profile = (): JSX.Element => {
                 Delete User Account
             </button>
             <h2 className="text-xl font-bold mb-2 mt-8">Admin Tools</h2>
-            { role === Role.Admin
+            { role === UserRole.Admin
               ? <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-5" >
                 <Link to={'/users'}>Manage Users</Link>
             </div>

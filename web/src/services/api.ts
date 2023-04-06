@@ -1,6 +1,7 @@
 import { type BaseQueryFn, createApi, type FetchArgs, fetchBaseQuery, type FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 import { type RootState } from '../app/store'
-import { logout, type Role, setToken } from '../features/auth/auth-slice'
+import { logout, setToken } from '../features/auth/auth-slice'
+import type UserRole from '../constants/roles'
 
 interface Profile {
   username: string
@@ -73,7 +74,7 @@ export const apiSlice = createApi({
   tagTypes: [TagType.Events],
   endpoints (builder) {
     return {
-      login: builder.mutation<{ token: string, 'refresh-token': string, role: Role }, { username: string, password: string }>({
+      login: builder.mutation<{ token: string, 'refresh-token': string, role: UserRole }, { username: string, password: string }>({
         query: (credentials) => ({
           url: 'auth/login',
           method: 'POST',
@@ -102,7 +103,7 @@ export const apiSlice = createApi({
         })
       }),
       changeUserRoleByAdmin: builder.mutation({ query: (change) => ({ url: 'users/change-role', method: 'PUT', body: change }) }),
-      fetchUsers: builder.query<{ users: User[], page: number, count: number }, { page: number, role: Role | undefined }>({
+      fetchUsers: builder.query<{ users: User[], page: number, count: number }, { page: number, role: UserRole | undefined }>({
         query: (params) => ({ url: 'users', params: { ...params } })
       }),
       registerUser: builder.mutation({
