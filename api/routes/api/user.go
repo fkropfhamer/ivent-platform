@@ -1,20 +1,15 @@
 package api
 
 import (
-	"context"
-	"ivent-api/db"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ivent-api/models"
 	"net/http"
 	"strconv"
-	"time"
-
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func ProfileHandle(c *gin.Context) {
-	userId, err := Authenticate(c, models.RoleUser)
+	user, err := Authenticate(c, models.RoleUser)
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -24,22 +19,10 @@ func ProfileHandle(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	filter := bson.M{"_id": userId}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := db.UserCollection.FindOne(ctx, filter).Decode(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "error",
-		})
-
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "profile",
 		"username": user.Name,
-		"id":       userId,
+		"id":       user.Id,
 	})
 }
 
@@ -314,7 +297,7 @@ func ChangePasswordHandle(c *gin.Context) {
 
 func ListUsersHandle(c *gin.Context) {
 	if _, err := Authenticate(c, models.RoleAdmin); err != nil {
-		c.JSON(http.StatusForbidden, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
 		})
 
