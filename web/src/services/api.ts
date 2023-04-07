@@ -40,20 +40,26 @@ const baseQuery = fetchBaseQuery({
   }
 })
 
+export const authApiSlice = createApi({
+  reducerPath: 'api/auth',
+  baseQuery,
+  endpoints (builder) {
+    return {
+      getRefreshToken: builder.query<{ token: string }, string>({ query: (refreshToken) => ({ url: 'auth/refresh', headers: { Refresh: refreshToken }, method: 'GET' }) })
+    }
+  }
+})
+
+export const { useGetRefreshTokenQuery } = authApiSlice
+
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions)
-
   const state = api.getState() as RootState
 
   if ((result.error != null) && result.error.status === 401) {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (state.auth.refreshToken) {
-      const refreshResult = await baseQuery({
-        url: 'auth/refresh',
-        headers: { refresh: state.auth.refreshToken }
-      }, api, extraOptions)
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-      if (refreshResult.data) {
+    if (state.auth.refreshToken != null) {
+      const refreshResult = await api.dispatch(authApiSlice.endpoints.getRefreshToken.initiate(state.auth.refreshToken))
+      if (refreshResult.data != null && refreshResult.error == null) {
         const { token } = refreshResult.data as { token: string }
         api.dispatch(setToken(token))
 
@@ -61,8 +67,8 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
       }
     }
 
-        api.dispatch(logout())
-    }
+    api.dispatch(logout())
+  }
 
   return result
 }
