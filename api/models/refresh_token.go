@@ -2,6 +2,9 @@ package models
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
 	"ivent-api/config"
 	"ivent-api/db"
 	"time"
@@ -11,13 +14,16 @@ import (
 )
 
 type RefreshToken struct {
-	ID   primitive.ObjectID `bson:"_id"`
+	ID   string `bson:"_id"`
 	IAT  int64
 	User primitive.ObjectID
 }
 
 func CreateRefreshToken(userID *primitive.ObjectID) (string, error) {
-	token := primitive.NewObjectID()
+	token := createRandomToken()
+	if token == "" {
+		return "", errors.New("token creation failed")
+	}
 
 	tokenObject := RefreshToken{
 		ID:   token,
@@ -33,10 +39,10 @@ func CreateRefreshToken(userID *primitive.ObjectID) (string, error) {
 		return "", err
 	}
 
-	return token.Hex(), nil
+	return token, nil
 }
 
-func DeleteRefreshToken(id primitive.ObjectID) error {
+func DeleteRefreshToken(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -65,20 +71,23 @@ func DeleteAllRefreshTokenForUser(userId *primitive.ObjectID) error {
 }
 
 func GetRefreshToken(id string) (*RefreshToken, error) {
-	objectID, err := primitive.ObjectIDFromHex(id)
-
-	if err != nil {
-		return nil, err
-	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	var token RefreshToken
-	filter := bson.M{"_id": objectID}
+	filter := bson.M{"_id": id}
 	if err := db.RefreshTokenCollection.FindOne(ctx, filter).Decode(&token); err != nil {
 		return nil, err
 	}
 
 	return &token, nil
+}
+
+func createRandomToken() string {
+	length := 32
+	b := make([]byte, length)
+	if _, err := rand.Read(b); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(b)
 }
