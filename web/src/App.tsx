@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import { Navigation } from './components/Navigation'
 import { useDispatch, useSelector } from 'react-redux'
 import { type RootState } from './app/store'
-import { hasRedirectedToLogin, setToken, unAuthenticate } from './features/auth/auth-slice'
+import { authenticate, hasRedirectedToLogin, unAuthenticate } from './features/auth/auth-slice'
 import { useEffect, useState } from 'react'
 import { useGetRefreshTokenQuery } from './services/api'
 
@@ -23,8 +23,10 @@ function App (): JSX.Element {
   }, [redirectLogout])
 
   useEffect(() => {
-    if ((data?.token) != null) {
-      dispatch(setToken(data?.token))
+    if (data != null) {
+      const { token, role } = data
+
+      dispatch(authenticate({ accessToken: token, role }))
       setIsLogInStatusChecked(true)
     }
 

@@ -227,6 +227,7 @@ func RefreshHandle(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
+		"role":  user.Role,
 	})
 }
 

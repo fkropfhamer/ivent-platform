@@ -1,6 +1,6 @@
 import { type BaseQueryFn, createApi, type FetchArgs, fetchBaseQuery, type FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 import { type RootState } from '../app/store'
-import { logout, setToken } from '../features/auth/auth-slice'
+import { authenticate, logout } from '../features/auth/auth-slice'
 import type UserRole from '../constants/roles'
 
 interface Profile {
@@ -45,7 +45,7 @@ export const authApiSlice = createApi({
   baseQuery,
   endpoints (builder) {
     return {
-      getRefreshToken: builder.query<{ token: string }, string>({ query: (refreshToken) => ({ url: 'auth/refresh', headers: { Refresh: refreshToken }, method: 'GET' }) })
+      getRefreshToken: builder.query<{ token: string, role: UserRole }, string>({ query: (refreshToken) => ({ url: 'auth/refresh', headers: { Refresh: refreshToken }, method: 'GET' }) })
     }
   }
 })
@@ -60,8 +60,8 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
     if (state.auth.refreshToken != null) {
       const refreshResult = await api.dispatch(authApiSlice.endpoints.getRefreshToken.initiate(state.auth.refreshToken))
       if (refreshResult.data != null && refreshResult.error == null) {
-        const { token } = refreshResult.data as { token: string }
-        api.dispatch(setToken(token))
+        const { token, role } = refreshResult.data
+        api.dispatch(authenticate({ accessToken: token, role }))
 
         return await baseQuery(args, api, extraOptions)
       }
