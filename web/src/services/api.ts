@@ -1,6 +1,6 @@
 import { type BaseQueryFn, createApi, type FetchArgs, fetchBaseQuery, type FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 import { type RootState } from '../app/store'
-import { logout, setToken } from '../features/auth/auth-slice'
+import { authenticate, logout } from '../features/auth/auth-slice'
 import type UserRole from '../constants/roles'
 
 interface Profile {
@@ -40,29 +40,34 @@ const baseQuery = fetchBaseQuery({
   }
 })
 
+export const authApiSlice = createApi({
+  reducerPath: 'api/auth',
+  baseQuery,
+  endpoints (builder) {
+    return {
+      getRefreshToken: builder.query<{ token: string, role: UserRole }, string>({ query: (refreshToken) => ({ url: 'auth/refresh', headers: { Refresh: refreshToken }, method: 'GET' }) })
+    }
+  }
+})
+
+export const { useGetRefreshTokenQuery } = authApiSlice
+
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions)
-
   const state = api.getState() as RootState
 
   if ((result.error != null) && result.error.status === 401) {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (state.auth.refreshToken) {
-      const refreshResult = await baseQuery({
-        url: 'auth/refresh',
-        headers: { refresh: state.auth.refreshToken }
-      }, api, extraOptions)
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-      if (refreshResult.data) {
-        const { token } = refreshResult.data as { token: string }
-        api.dispatch(setToken(token))
+    if (state.auth.refreshToken != null) {
+      const refreshResult = await api.dispatch(authApiSlice.endpoints.getRefreshToken.initiate(state.auth.refreshToken))
+      if (refreshResult.data != null && refreshResult.error == null) {
+        const { token, role } = refreshResult.data
+        api.dispatch(authenticate({ accessToken: token, role }))
 
         return await baseQuery(args, api, extraOptions)
       }
     }
 
     api.dispatch(logout())
-    window.location.href = '/login'
   }
 
   return result
