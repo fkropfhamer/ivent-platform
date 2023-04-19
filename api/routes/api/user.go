@@ -1,12 +1,14 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"errors"
 	"ivent-api/models"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func ProfileHandle(c *gin.Context) {
@@ -168,6 +170,14 @@ func RegisterHandle(c *gin.Context) {
 		return
 	}
 
+	if err := validatePassword(body.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
 	if body.Username == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "username can not be empty",
@@ -195,6 +205,44 @@ func RegisterHandle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "user registered",
 	})
+}
+
+func isDigit(b byte) bool {
+	return b >= 48 && b <= 57
+}
+
+func isSpecialCharacter(b byte) bool {
+	return !isDigit(b) && (b < 65 || b > 122 || (b >= 91 && b <= 96))
+}
+
+func validatePassword(password string) error {
+	if len(password) < 12 {
+		return errors.New("Password too short")
+	}
+
+	digitCount := 0
+	specialCharacterCount := 0
+
+	for i := 0; i < len(password); i++ {
+		r := password[i]
+		if isDigit(r) {
+			digitCount++
+		}
+
+		if isSpecialCharacter(r) {
+			specialCharacterCount++
+		}
+	}
+
+	if digitCount <= 0 {
+		return errors.New("Password should contain atleast one digit")
+	}
+
+	if specialCharacterCount <= 0 {
+		return errors.New("Password should contain atleast one special character")
+	}
+
+	return nil
 }
 
 func DeleteUserHandle(c *gin.Context) {
