@@ -4,6 +4,7 @@ import { useRegisterUserMutation } from '../services/api'
 
 export const Register = (): JSX.Element => {
   const navigate = useNavigate()
+  const [registerError, setRegisterError] = useState("")
 
   const [register, _] = useRegisterUserMutation()
 
@@ -14,13 +15,22 @@ export const Register = (): JSX.Element => {
 
   const submit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
-    await register(formState)
-    navigate('/login')
+    try {
+        await register(formState).unwrap()
+        navigate('/login')
+    } catch(error) {
+        setRegisterError((error as any).data.message)
+    }
   }
 
   return (
         <div className="w-96 bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
             <h1 className="text-3xl text-center font-bold mb-6">Register</h1>
+            {(registerError !== '') && (
+                <p className="text-red-500 text-lg mb-4">
+                    {registerError}
+                </p>
+            )}
             <form onSubmit={(e) => { void submit(e) }}>
                 <label className="block text-lg mb-4">Username</label>
                 <input
