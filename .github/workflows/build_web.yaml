@@ -56,7 +56,7 @@ jobs:
 
 
   tests:
-    name: Run linters for web
+    name: Run tests for web
     runs-on: ubuntu-latest
     needs: [build]
     defaults:
