@@ -12,7 +12,9 @@ function Index (): JSX.Element {
             <h1 className="text-3xl text-center font-bold mb-6">Welcome to the IVENT-Platform</h1>
             <div className="card">
                 <p className="text-lg text-center">
-                    {isFetching ? 'Loading' : (
+                    {isFetching
+                        ? 'Loading'
+                        : (
                         <>
                             Home of <span className="text-green-500 font-bold">{data.count}</span> events and counting
                         </>
@@ -21,11 +23,13 @@ function Index (): JSX.Element {
                 <div className="flex justify-center space-x-4 mt-8">
                     <Link to="/register" className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 px-4 transition-colors duration-300">Register</Link>
                     <Link to="/login" className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 px-4 transition-colors duration-300">Login</Link>
-                    {isLoggedIn ? (
+                    {isLoggedIn
+                        ? (
                         <Link to="/events" className="bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 px-4 transition-colors duration-300">
                             Events
                         </Link>
-                    ) : (
+                    )
+                        : (
                         <></>
                     )}
                 </div>
