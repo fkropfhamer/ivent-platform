@@ -1,12 +1,13 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"ivent-api/models"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func ProfileHandle(c *gin.Context) {
@@ -176,6 +177,22 @@ func RegisterHandle(c *gin.Context) {
 		return
 	}
 
+	if err := checkUsernameValid(body.Username); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
+	if err := models.CheckUsernameAvailable(body.Username); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
 	newUser := models.User{
 		Id:       primitive.NewObjectID(),
 		Name:     body.Username,
@@ -195,6 +212,11 @@ func RegisterHandle(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "user registered",
 	})
+}
+
+func checkUsernameValid(username string) error {
+
+	return nil
 }
 
 func DeleteUserHandle(c *gin.Context) {

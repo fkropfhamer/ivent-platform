@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"ivent-api/db"
 	"log"
 	"strings"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -121,6 +122,21 @@ func GetUser(id *primitive.ObjectID) (*User, error) {
 	}
 
 	return &user, nil
+}
+
+func CheckUsernameAvailable(username string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	count, err := db.UserCollection.CountDocuments(ctx, bson.M{"name": username})
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		return errors.New("Username already taken")
+	}
+
+	return nil
 }
 
 func GetUsers(page int64, filter bson.M) ([]User, int64, error) {
