@@ -38,6 +38,7 @@ export const Login = (): JSX.Element => {
             {(loginError.text !== '') && (
                 <p className="text-red-500 text-lg mb-4">
                     {loginError.text}
+
                 </p>
             )}
             <form onSubmit={(e) => { void submit(e) }}>

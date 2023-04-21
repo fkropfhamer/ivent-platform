@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useRegisterUserMutation } from '../services/api'
+import { validatePassword } from '../services/validation'
 
 export const Register = (): JSX.Element => {
   const navigate = useNavigate()
-  const [registerError, setRegisterError] = useState("")
+  const [registerError, setRegisterError] = useState('')
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+  const [usernameErrors, setUsernameErrors] = useState<string[]>([])
 
   const [register, _] = useRegisterUserMutation()
 
@@ -15,11 +18,38 @@ export const Register = (): JSX.Element => {
 
   const submit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
+    setPasswordErrors([])
+    setUsernameErrors([])
+
+    if (formState.username === '') {
+      setUsernameErrors(['username can not be empty'])
+
+      return
+    }
+
+    if (formState.password === '') {
+      setPasswordErrors(['password can not be empty'])
+
+      return
+    }
+
+    const passwordErr = validatePassword(formState.password)
+    if (passwordErr.hasErrors) {
+      setPasswordErrors([passwordErr.length, passwordErr.numberCount, passwordErr.specialCharCount].reduce<string[]>((p, c) => {
+        if (c !== null) {
+          return [...p, c]
+        }
+
+        return p
+      }, []))
+      return
+    }
+
     try {
-        await register(formState).unwrap()
-        navigate('/login')
-    } catch(error) {
-        setRegisterError((error as any).data.message)
+      await register(formState).unwrap()
+      navigate('/login')
+    } catch (error) {
+      setRegisterError((error as any).data.message)
     }
   }
 
@@ -39,6 +69,13 @@ export const Register = (): JSX.Element => {
                     value={formState.username}
                     onChange={(e) => { setFormState((prev) => ({ ...prev, username: e.target.value })) }}
                 />
+                {(usernameErrors.length !== 0) && (
+                <p className="text-red-500 text-lg mb-4">
+                    {
+                      usernameErrors.map((e, idx) => <div key={idx}>{e}</div>)
+                    }
+                </p>
+                )}
                 <label className="block text-lg mb-4">Password</label>
                 <input
                     type="password"
@@ -46,6 +83,13 @@ export const Register = (): JSX.Element => {
                     value={formState.password}
                     onChange={(e) => { setFormState((prev) => ({ ...prev, password: e.target.value })) }}
                 />
+                {(passwordErrors.length !== 0) && (
+                <p className="text-red-500 text-lg mb-4">
+                    {
+                      passwordErrors.map((e, idx) => <div key={idx}>{e}</div>)
+                    }
+                </p>
+                )}
                 <button
                     className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-6 focus:outline-none" type='submit'
                 >
