@@ -44,7 +44,7 @@ export const Profile = (): JSX.Element => {
                 <Link to="/events/create"> Create Event </Link>
             </div>
             <div className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-20" >
-                <Link to="/events"> GoTo Events </Link>
+                <Link to="/events"> View Events </Link>
             </div>
 
             <div className="mb-6">

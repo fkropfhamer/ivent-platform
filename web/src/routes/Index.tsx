@@ -8,7 +8,7 @@ function Index (): JSX.Element {
   const { data = { count: 0 }, isFetching } = useFetchEventsQuery({ page: 0, marked: undefined })
 
   return (
-        <div className="w-96 bg-gray-100 rounded-lg mx-auto my-20 p-8 border-2 border-gray-200">
+        <div className="w-full bg-gray-100 rounded-lg mx-auto my-20 pt-8 border-2 border-gray-200">
             <h1 className="text-3xl text-center font-bold mb-6">Welcome to the IVENT-Platform</h1>
             <div className="card">
                 <p className="text-lg text-center">
@@ -17,7 +17,7 @@ function Index (): JSX.Element {
                       : (
                             <>
                                 Home of <span className="text-green-500 font-bold">{data.count}</span> events and
-                                counting
+                                counting.
                             </>
                         )}
                 </p>
