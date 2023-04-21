@@ -7,19 +7,22 @@ export const Register = (): JSX.Element => {
   const navigate = useNavigate()
   const [registerError, setRegisterError] = useState('')
   const [passwordErrors, setPasswordErrors] = useState<string[]>([])
+  const [repeatPasswordErrors, setRepeatPasswordErrors] = useState<string[]>([])
   const [usernameErrors, setUsernameErrors] = useState<string[]>([])
 
   const [register, _] = useRegisterUserMutation()
 
   const [formState, setFormState] = useState({
     username: '',
-    password: ''
+    password: '',
+    repeatPassword: ''
   })
 
   const submit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     setPasswordErrors([])
     setUsernameErrors([])
+    setRepeatPasswordErrors([])
 
     if (formState.username === '') {
       setUsernameErrors(['username can not be empty'])
@@ -42,6 +45,12 @@ export const Register = (): JSX.Element => {
 
         return p
       }, []))
+      return
+    }
+
+    if (formState.repeatPassword !== formState.password) {
+      setRepeatPasswordErrors(['passwords do not match'])
+
       return
     }
 
@@ -87,6 +96,20 @@ export const Register = (): JSX.Element => {
                 <p className="text-red-500 text-lg mb-4">
                     {
                       passwordErrors.map((e, idx) => <div key={idx}>{e}</div>)
+                    }
+                </p>
+                )}
+                <label className="block text-lg mb-4">Repeat Password</label>
+                <input
+                    type="password"
+                    className="w-full px-4 py-2 rounded-lg text-lg mb-6 border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    value={formState.repeatPassword}
+                    onChange={(e) => { setFormState((prev) => ({ ...prev, repeatPassword: e.target.value })) }}
+                />
+                {(repeatPasswordErrors.length !== 0) && (
+                <p className="text-red-500 text-lg mb-4">
+                    {
+                      repeatPasswordErrors.map((e, idx) => <div key={idx}>{e}</div>)
                     }
                 </p>
                 )}
