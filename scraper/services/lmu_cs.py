@@ -21,6 +21,7 @@ def scrape_lmu_cs(api_client: ApiClient, dry_run=False):
 
     event_type_blacklist = ["LMU Talentpool", "CV Check"]
 
+    count = 0
     for appointment in appointments:
         table_cell = appointment.find('div')
         if not table_cell:
@@ -35,8 +36,9 @@ def scrape_lmu_cs(api_client: ApiClient, dry_run=False):
         if event_type in event_type_blacklist:
             continue
 
+        description = None
         if len(infos) == 5:
-            description = infos[4]
+            description = infos[4].text
 
         registration_link = table_cell.find('a')['href']
 
@@ -45,11 +47,13 @@ def scrape_lmu_cs(api_client: ApiClient, dry_run=False):
         end_date = end_date.astimezone(pytz.timezone('Europe/Berlin'))
         identifier = extract_identifier_from_registration_link(registration_link)
 
-        event = Event(name=name, start=start_date, end=end_date, identifier=identifier, link=registration_link, location=location, organizer="lmu-cs")
+        event = Event(name=name, start=start_date, end=end_date, identifier=identifier, link=registration_link, location=location, organizer="lmu-cs", description=description)
+        count += 1
 
         if not dry_run:
             api_client.create_or_update_event(event)
 
+    logger.info(f"scraped {count} events")
     logger.info("finished scraping lmu-cs")
 
 
