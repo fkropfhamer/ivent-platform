@@ -13,16 +13,17 @@ import (
 )
 
 type Event struct {
-	ID         primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name       string             `json:"name"`
-	Start      *primitive.DateTime
-	End        *primitive.DateTime
-	Identifier *string
-	Location   string
-	PriceInfo  string `bson:"price_info" json:"price_info"`
-	Organizer  string
-	Link       string
-	Creator    primitive.ObjectID
+	ID          primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	Name        string             `json:"name"`
+	Description string
+	Start       *primitive.DateTime
+	End         *primitive.DateTime
+	Identifier  *string
+	Location    string
+	PriceInfo   string `bson:"price_info" json:"price_info"`
+	Organizer   string
+	Link        string
+	Creator     primitive.ObjectID
 }
 
 func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
@@ -45,32 +46,34 @@ func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
 }
 
 type ResponseEvent struct {
-	ID         primitive.ObjectID `json:"id,omitempty"`
-	Name       string             `json:"name"`
-	Start      *primitive.DateTime
-	End        *primitive.DateTime
-	Identifier *string
-	Location   string
-	PriceInfo  string `json:"price_info"`
-	Organizer  string
-	Link       string
-	Creator    primitive.ObjectID
-	IsMarked   bool `json:"is_marked" binding:"required"`
+	ID          primitive.ObjectID `json:"id,omitempty"`
+	Name        string             `json:"name"`
+	Description string
+	Start       *primitive.DateTime
+	End         *primitive.DateTime
+	Identifier  *string
+	Location    string
+	PriceInfo   string `json:"price_info"`
+	Organizer   string
+	Link        string
+	Creator     primitive.ObjectID
+	IsMarked    bool `json:"is_marked" binding:"required"`
 }
 
 func fromEvent(event *Event) ResponseEvent {
 	return ResponseEvent{
-		ID:         event.ID,
-		Name:       event.Name,
-		Start:      event.Start,
-		End:        event.End,
-		Identifier: event.Identifier,
-		Location:   event.Location,
-		PriceInfo:  event.PriceInfo,
-		Organizer:  event.Organizer,
-		Link:       event.Link,
-		Creator:    event.Creator,
-		IsMarked:   false,
+		ID:          event.ID,
+		Name:        event.Name,
+		Description: event.Description,
+		Start:       event.Start,
+		End:         event.End,
+		Identifier:  event.Identifier,
+		Location:    event.Location,
+		PriceInfo:   event.PriceInfo,
+		Organizer:   event.Organizer,
+		Link:        event.Link,
+		Creator:     event.Creator,
+		IsMarked:    false,
 	}
 }
 

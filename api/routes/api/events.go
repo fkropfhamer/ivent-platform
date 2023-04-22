@@ -12,14 +12,15 @@ import (
 )
 
 type createEventRequestBody struct {
-	Name       string
-	Start      string
-	End        string
-	Identifier string
-	Location   string
-	PriceInfo  string `bson:"price_info" json:"price_info"`
-	Organizer  string
-	Link       string
+	Name        string
+	Description string
+	Start       string
+	End         string
+	Identifier  string
+	Location    string
+	PriceInfo   string `bson:"price_info" json:"price_info"`
+	Organizer   string
+	Link        string
 }
 
 func CreateEventHandler(c *gin.Context) {
@@ -51,13 +52,14 @@ func CreateEventHandler(c *gin.Context) {
 	}
 
 	event := models.Event{
-		ID:        primitive.NewObjectID(),
-		Name:      body.Name,
-		Location:  body.Location,
-		PriceInfo: body.PriceInfo,
-		Organizer: body.Organizer,
-		Link:      body.Link,
-		Creator:   user.Id,
+		ID:          primitive.NewObjectID(),
+		Name:        body.Name,
+		Description: body.Description,
+		Location:    body.Location,
+		PriceInfo:   body.PriceInfo,
+		Organizer:   body.Organizer,
+		Link:        body.Link,
+		Creator:     user.Id,
 	}
 
 	if body.End != "" {
