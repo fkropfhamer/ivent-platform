@@ -124,6 +124,11 @@ func ListEventsHandler(c *gin.Context) {
 		filter["organizer"] = bson.M{"$in": []string{organizerParam}}
 	}
 
+	identifierParam := c.Query("identifier")
+	if identifierParam != "" {
+		filter["identifier"] = bson.M{"$in": []string{identifierParam}}
+	}
+
 	markedParam := c.Query("marked")
 	if markedParam != "" {
 		if user == nil {
