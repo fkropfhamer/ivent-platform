@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -155,8 +154,6 @@ func ListEventsHandler(c *gin.Context) {
 	events, count, err := models.GetEvents(page, filter)
 
 	if err != nil {
-		fmt.Println(err)
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})

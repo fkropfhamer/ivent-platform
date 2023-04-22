@@ -28,7 +28,6 @@ type Event struct {
 func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-
 	defer cancel()
 
 	result, err := db.EventsCollection.InsertOne(ctx, newEvent)
