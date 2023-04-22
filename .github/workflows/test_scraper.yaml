@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: Run tests for scraper
     runs-on: ubuntu-latest
     strategy:
       matrix:
