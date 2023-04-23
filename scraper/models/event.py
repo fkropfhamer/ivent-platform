@@ -15,10 +15,16 @@ class Event:
                f"Organizer: {self.organizer}\nLink: {self.link}"
 
     def get_json_dict(self):
+
+        end = self.end
+
+        if self.end is not None:
+            end = self.end.isoformat()
+
         return {
             "name": self.name,
             "start": self.start.isoformat(),
-            "end": self.end,
+            "end": end,
             "location": self.location,
             "price_info": self.price_info,
             "organizer": self.organizer,
