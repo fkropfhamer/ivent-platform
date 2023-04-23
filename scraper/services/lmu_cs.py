@@ -47,7 +47,7 @@ def scrape_lmu_cs(api_client: ApiClient, dry_run=False):
         end_date = end_date.astimezone(pytz.timezone('Europe/Berlin'))
         identifier = extract_identifier_from_registration_link(registration_link)
 
-        event = Event(name=name, start=start_date, end=end_date, identifier=identifier, link=registration_link, location=location, organizer="lmu-cs", description=description)
+        event = Event(name=name, start=start_date, end=end_date, identifier=identifier, link=registration_link, location=location, organizer="LMU Career Service", description=description)
         count += 1
 
         if not dry_run:
