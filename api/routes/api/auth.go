@@ -51,7 +51,7 @@ func hasRole(userRole models.Role, requiredRole models.Role) bool {
 	return false
 }
 
-func Authenticate(c *gin.Context, requiredRole models.Role) (*primitive.ObjectID, error) {
+func Authenticate(c *gin.Context, requiredRole models.Role) (*models.User, error) {
 	tokenString, err := extractToken(c)
 
 	if err != nil {
@@ -98,7 +98,7 @@ func Authenticate(c *gin.Context, requiredRole models.Role) (*primitive.ObjectID
 			return nil, errors.New("wrong token")
 		}
 
-		return &userObjectId, nil
+		return user, nil
 	}
 
 	return nil, errors.New("invalid token")
@@ -227,6 +227,7 @@ func RefreshHandle(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
+		"role":  user.Role,
 	})
 }
 

@@ -1,7 +1,15 @@
-declare enum UserRole {
-  ROLE_USER = 'ROLE_USER',
-  ROLE_ADMIN = 'ROLE_ADMIN',
-  ROLE_GUEST = 'ROLE_GUEST'
+enum UserRole {
+  User = 'ROLE_USER',
+  Admin = 'ROLE_ADMIN',
+  Service = 'ROLE_SERVICE',
+}
+
+export const userRoleToDisplayString = (role: UserRole): string => {
+  switch (role) {
+    case UserRole.User: return 'User'
+    case UserRole.Admin: return 'Admin'
+    case UserRole.Service: return 'Service'
+  }
 }
 
 export default UserRole

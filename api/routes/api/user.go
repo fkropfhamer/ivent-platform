@@ -1,12 +1,10 @@
 package api
 
 import (
-	"context"
-	"ivent-api/db"
+	"errors"
 	"ivent-api/models"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,7 +12,7 @@ import (
 )
 
 func ProfileHandle(c *gin.Context) {
-	userId, err := Authenticate(c, models.RoleUser)
+	user, err := Authenticate(c, models.RoleUser)
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -24,22 +22,10 @@ func ProfileHandle(c *gin.Context) {
 		return
 	}
 
-	var user models.User
-	filter := bson.M{"_id": userId}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := db.UserCollection.FindOne(ctx, filter).Decode(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "error",
-		})
-
-		return
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"message":  "profile",
 		"username": user.Name,
-		"id":       userId,
+		"id":       user.Id,
 	})
 }
 
@@ -184,6 +170,14 @@ func RegisterHandle(c *gin.Context) {
 		return
 	}
 
+	if err := validatePassword(body.Password); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
 	if body.Username == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "username can not be empty",
@@ -213,8 +207,46 @@ func RegisterHandle(c *gin.Context) {
 	})
 }
 
+func isDigit(b byte) bool {
+	return b >= 48 && b <= 57
+}
+
+func isSpecialCharacter(b byte) bool {
+	return !isDigit(b) && (b < 65 || b > 122 || (b >= 91 && b <= 96))
+}
+
+func validatePassword(password string) error {
+	if len(password) < 12 {
+		return errors.New("Password too short")
+	}
+
+	digitCount := 0
+	specialCharacterCount := 0
+
+	for i := 0; i < len(password); i++ {
+		r := password[i]
+		if isDigit(r) {
+			digitCount++
+		}
+
+		if isSpecialCharacter(r) {
+			specialCharacterCount++
+		}
+	}
+
+	if digitCount <= 0 {
+		return errors.New("Password should contain atleast one digit")
+	}
+
+	if specialCharacterCount <= 0 {
+		return errors.New("Password should contain atleast one special character")
+	}
+
+	return nil
+}
+
 func DeleteUserHandle(c *gin.Context) {
-	id, err := Authenticate(c, models.RoleUser)
+	user, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
@@ -223,7 +255,7 @@ func DeleteUserHandle(c *gin.Context) {
 		return
 	}
 
-	if err := models.DeleteUser(id); err != nil {
+	if err := models.DeleteUser(&user.Id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
@@ -231,7 +263,7 @@ func DeleteUserHandle(c *gin.Context) {
 		return
 	}
 
-	if err := models.DeleteAllRefreshTokenForUser(id); err != nil {
+	if err := models.DeleteAllRefreshTokenForUser(&user.Id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
@@ -273,7 +305,7 @@ type ChangePasswordRequestBody struct {
 }
 
 func ChangePasswordHandle(c *gin.Context) {
-	id, err := Authenticate(c, models.RoleUser)
+	user, err := Authenticate(c, models.RoleUser)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
@@ -291,7 +323,7 @@ func ChangePasswordHandle(c *gin.Context) {
 		return
 	}
 
-	if err := CheckPassword(id, body.CurrentPassword); err != nil {
+	if err := CheckPassword(&user.Id, body.CurrentPassword); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid password",
 		})
@@ -299,7 +331,7 @@ func ChangePasswordHandle(c *gin.Context) {
 		return
 	}
 
-	if err := models.UpdatePassword(id, body.NewPassword); err != nil {
+	if err := models.UpdatePassword(&user.Id, body.NewPassword); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
@@ -314,7 +346,7 @@ func ChangePasswordHandle(c *gin.Context) {
 
 func ListUsersHandle(c *gin.Context) {
 	if _, err := Authenticate(c, models.RoleAdmin); err != nil {
-		c.JSON(http.StatusForbidden, gin.H{
+		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "error",
 		})
 
@@ -327,7 +359,24 @@ func ListUsersHandle(c *gin.Context) {
 		page = 0
 	}
 
-	users, count, err := models.GetUsers(page)
+	filter := bson.M{}
+
+	roleParam := c.Query("role")
+	if roleParam != "" {
+
+		role, err := models.RoleFromString(roleParam)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "invalid role param",
+			})
+
+			return
+		}
+
+		filter["role"] = bson.M{"$eq": role}
+	}
+
+	users, count, err := models.GetUsers(page, filter)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{

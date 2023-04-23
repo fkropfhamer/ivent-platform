@@ -16,15 +16,18 @@ export const Navigation = (): JSX.Element => {
   return (
         <nav className="flex justify-between items-center py-4">
             <div className="flex items-center">
-                <Link to="/" className="text-xl font-bold">
+                <Link to="/" className="text-xl font-bold py-2">
                     IVENT-Plattform
                 </Link>
             </div>
             <div className="flex items-center">
+            <Link to="/about" className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mr-2">
+                About
+            </Link>
                 {isLoggedIn
                   ? (
                     <>
-                        <Link to="/profile" className="mr-4">
+                        <Link to="/profile" className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-2">
                             Profile
                         </Link>
                         <button

@@ -15,10 +15,30 @@ export const Login = (): JSX.Element => {
     password: ''
   })
 
+  const [formErrors, setFormErrors] = useState({
+    usernameError: '',
+    passwordError: ''
+  })
+
   const [loginError, setLoginError] = useState({ text: '', duration: 0 })
 
   const submit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
+
+    setFormErrors({ usernameError: '', passwordError: '' })
+    setLoginError({ text: '', duration: 0 })
+
+    if (formState.username === '') {
+      setFormErrors({ usernameError: 'username can not be empty', passwordError: '' })
+
+      return
+    }
+
+    if (formState.password === '') {
+      setFormErrors({ usernameError: '', passwordError: 'password can not be empty' })
+
+      return
+    }
 
     try {
       const loginResponse = await login(formState).unwrap()
@@ -49,6 +69,11 @@ export const Login = (): JSX.Element => {
                     onChange={(e) => { setFormState((prev) => ({ ...prev, username: e.target.value })) }
                     }
                 />
+                {(formErrors.usernameError !== '') && (
+                <p className="text-red-500 text-lg mb-4">
+                    {formErrors.usernameError}
+                </p>
+                )}
                 <label className="block text-lg mb-4">Password</label>
                 <input
                     type="password"
@@ -57,6 +82,11 @@ export const Login = (): JSX.Element => {
                     onChange={(e) => { setFormState((prev) => ({ ...prev, password: e.target.value })) }
                     }
                 />
+                {(formErrors.passwordError !== '') && (
+                <p className="text-red-500 text-lg mb-4">
+                    {formErrors.passwordError}
+                </p>
+                )}
                 <button
                     className="w-full bg-green-500 hover:bg-green-600 text-white rounded-lg py-2 text-lg mb-6"
                 >

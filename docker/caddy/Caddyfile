@@ -12,6 +12,7 @@ log
 route {
     root * /srv/app/public
     reverse_proxy /api/* http://api:8080
+    try_files {path} /
     encode zstd gzip
     file_server
 }

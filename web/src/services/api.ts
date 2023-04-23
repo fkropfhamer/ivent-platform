@@ -1,6 +1,7 @@
 import { type BaseQueryFn, createApi, type FetchArgs, fetchBaseQuery, type FetchBaseQueryError } from '@reduxjs/toolkit/query/react'
 import { type RootState } from '../app/store'
-import { logout, type Role, setToken } from '../features/auth/auth-slice'
+import { authenticate, logout } from '../features/auth/auth-slice'
+import type UserRole from '../constants/roles'
 
 interface Profile {
   username: string
@@ -10,6 +11,7 @@ interface Profile {
 export interface Event {
   name: string
   id: string
+  is_marked: boolean
 }
 
 export interface User {
@@ -17,6 +19,12 @@ export interface User {
   name: string
   role: string
 }
+
+enum TagType {
+  Events = 'Events'
+}
+
+const ListID = 'LIST'
 
 const baseUrl = import.meta.env.PROD ? '/api/' : 'http://localhost:8080/api/'
 
@@ -32,29 +40,34 @@ const baseQuery = fetchBaseQuery({
   }
 })
 
+export const authApiSlice = createApi({
+  reducerPath: 'api/auth',
+  baseQuery,
+  endpoints (builder) {
+    return {
+      getRefreshToken: builder.query<{ token: string, role: UserRole }, string>({ query: (refreshToken) => ({ url: 'auth/refresh', headers: { Refresh: refreshToken }, method: 'GET' }) })
+    }
+  }
+})
+
+export const { useGetRefreshTokenQuery } = authApiSlice
+
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions)
-
   const state = api.getState() as RootState
 
   if ((result.error != null) && result.error.status === 401) {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (state.auth.refreshToken) {
-      const refreshResult = await baseQuery({
-        url: 'auth/refresh',
-        headers: { refresh: state.auth.refreshToken }
-      }, api, extraOptions)
-      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-      if (refreshResult.data) {
-        const { token } = refreshResult.data as { token: string }
-        api.dispatch(setToken(token))
+    if (state.auth.refreshToken != null) {
+      const refreshResult = await api.dispatch(authApiSlice.endpoints.getRefreshToken.initiate(state.auth.refreshToken))
+      if (refreshResult.data != null && refreshResult.error == null) {
+        const { token, role } = refreshResult.data
+        api.dispatch(authenticate({ accessToken: token, role }))
 
         return await baseQuery(args, api, extraOptions)
       }
     }
 
     api.dispatch(logout())
-    window.location.href = '/login'
   }
 
   return result
@@ -63,9 +76,10 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
+  tagTypes: [TagType.Events],
   endpoints (builder) {
     return {
-      login: builder.mutation<{ token: string, 'refresh-token': string, role: Role }, { username: string, password: string }>({
+      login: builder.mutation<{ token: string, 'refresh-token': string, role: UserRole }, { username: string, password: string }>({
         query: (credentials) => ({
           url: 'auth/login',
           method: 'POST',
@@ -74,7 +88,18 @@ export const apiSlice = createApi({
       }),
       event: builder.query<Event, string>({ query: (id) => `events/${id}` }),
       createEvent: builder.mutation({ query: (event) => ({ url: 'events', method: 'POST', body: event }) }),
-      fetchEvents: builder.query<{ events: [Event], page: number, count: number }, number>({ query: (page) => `events?page=${page}` }),
+      fetchEvents: builder.query<{ events: Event[], page: number, count: number }, { page: number, marked: string | undefined }>({
+        query: (params) => ({ url: 'events', params: { ...params } }),
+        providesTags: (result) => {
+          if (result != null) {
+            return [
+              ...result.events.map(({ id }) => ({ type: TagType.Events as const, id })),
+              { type: TagType.Events, id: ListID }
+            ]
+          }
+          return [{ type: TagType.Events, id: ListID }]
+        }
+      }),
       createUserByAdmin: builder.mutation({ query: (user) => ({ url: 'users/create', method: 'POST', body: user }) }),
       deleteUserByAdmin: builder.mutation<void, string>({
         query: (id) => ({
@@ -83,7 +108,9 @@ export const apiSlice = createApi({
         })
       }),
       changeUserRoleByAdmin: builder.mutation({ query: (change) => ({ url: 'users/change-role', method: 'PUT', body: change }) }),
-      fetchUsers: builder.query<{ users: [User], page: number, count: number }, number>({ query: (page) => `users?page=${page}` }),
+      fetchUsers: builder.query<{ users: User[], page: number, count: number }, { page: number, role: UserRole | undefined }>({
+        query: (params) => ({ url: 'users', params: { ...params } })
+      }),
       registerUser: builder.mutation({
         query: (credentials) => ({
           url: 'users/register',
@@ -100,7 +127,9 @@ export const apiSlice = createApi({
           body
         })
       }),
-      createServiceAccount: builder.mutation<{ token: string }, { name: string }>({ query: (body) => ({ url: 'users/service', method: 'POST', body }) })
+      createServiceAccount: builder.mutation<{ token: string }, { name: string }>({ query: (body) => ({ url: 'users/service', method: 'POST', body }) }),
+      markEvent: builder.mutation<void, string>({ query: (id) => ({ url: `events/${id}/mark`, method: 'PUT' }), invalidatesTags: (_result, _error, _arg) => [{ type: TagType.Events, id: ListID }] }),
+      unmarkEvent: builder.mutation<void, string>({ query: (id) => ({ url: `events/${id}/unmark`, method: 'PUT' }), invalidatesTags: (_result, _error, _arg) => [{ type: TagType.Events, id: ListID }] })
     }
   }
 })
@@ -118,5 +147,7 @@ export const {
   useDeleteUserByAdminMutation,
   useChangeUserRoleByAdminMutation,
   useChangePasswordMutation,
-  useCreateServiceAccountMutation
+  useCreateServiceAccountMutation,
+  useMarkEventMutation,
+  useUnmarkEventMutation
 } = apiSlice

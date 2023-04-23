@@ -3,10 +3,12 @@ package models
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"ivent-api/db"
 	"log"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,11 +16,12 @@ import (
 )
 
 type User struct {
-	Id       primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name     string             `json:"name"`
-	Role     Role               `json:"role"`
-	Password string             `json:"-"`
-	Token    string             `json:"-"`
+	Id           primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	Name         string             `json:"name"`
+	Role         Role               `json:"role"`
+	Password     string             `json:"-"`
+	Token        string             `json:"-"`
+	MarkedEvents []primitive.ObjectID
 }
 
 type Role string
@@ -28,6 +31,19 @@ const (
 	RoleUser    Role = "ROLE_USER"
 	RoleService Role = "ROLE_SERVICE"
 )
+
+func RoleFromString(role string) (Role, error) {
+	switch strings.ToUpper(role) {
+	case string(RoleAdmin):
+		return RoleAdmin, nil
+	case string(RoleUser):
+		return RoleUser, nil
+	case string(RoleService):
+		return RoleService, nil
+	default:
+		return "", errors.New("invalid role")
+	}
+}
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 13)
@@ -65,6 +81,8 @@ func UpdateUser(id *primitive.ObjectID, update interface{}) error {
 	defer cancel()
 	result, err := db.UserCollection.UpdateByID(ctx, id, update)
 	if err != nil || result.MatchedCount == 0 {
+		fmt.Println(err)
+
 		return errors.New("update failed")
 	}
 
@@ -105,10 +123,13 @@ func GetUser(id *primitive.ObjectID) (*User, error) {
 	return &user, nil
 }
 
-func GetUsers(page int64) ([]User, int64, error) {
+func GetUsers(page int64, filter bson.M) ([]User, int64, error) {
 	pageLimit := int64(15)
 	skip := page * pageLimit
-	filter := bson.D{}
+
+	if filter == nil {
+		filter = bson.M{}
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
