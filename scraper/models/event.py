@@ -18,7 +18,7 @@ class Event:
         return {
             "name": self.name,
             "start": self.start.isoformat(),
-            "end": self.end.isoformat(),
+            "end": self.end,
             "location": self.location,
             "price_info": self.price_info,
             "organizer": self.organizer,

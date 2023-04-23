@@ -1,12 +1,14 @@
-from datetime import datetime, timedelta
-from bs4 import BeautifulSoup
 import logging
+import pytz
+from datetime import datetime, timedelta
+
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from models.event import Event
+from scraper.models.event import Event
 
 
 def scrape_staatsoper(api_client, dry_run=False):
@@ -40,20 +42,26 @@ def scrape_staatsoper(api_client, dry_run=False):
             group_rows = group.find_all('div', class_='activity-list__row')
             for group_row in group_rows:
                 name = group_row.find('h3').text.strip()
+                time_and_location_text = group_row.find('div', class_='activity-list__text').find('span').text
+                location = time_and_location_text.split("|")[1].strip()
                 date = group_row['data-date']
-                location_text = group_row.find('div', class_='activity-list__text').find('span').text
-                location = location_text.split("|")[1].strip()
+                time = time_and_location_text.split("|")[0].strip()[:5]
+                start = datetime.strptime(date + " " + time, "%Y-%m-%d %H.%M").astimezone(pytz.timezone('Europe/Berlin'))
 
-                price_info = group_row.find('p', class_='activity-list-price-info').find('span').text.strip().replace("\n", "")
+                price_info = group_row.find('p', class_='activity-list-price-info').find('span').text.strip().replace(
+                    "\n", "")
                 organizer = "Bayerische Staatsoper"
                 link = "https://www.staatsoper.de" + group_row.find('a', class_='activity-list__content')['href']
 
-                event = Event(name=name, date=date, location=location, price_info=price_info, organizer=organizer, link=link)
+                identifier = group_row.find('input', class_='activity-list--toggle')['value']
+
+                event = Event(name=name, start=start, location=location, price_info=price_info, organizer=organizer,
+                              link=link, identifier=identifier)
                 logger.debug(event)
                 events.append(event)
 
                 if not dry_run:
-                    api_client.create_event(event)
+                    api_client.create_or_update_event(event)
 
         current_month += timedelta(days=30)
 
