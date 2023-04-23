@@ -331,6 +331,14 @@ func ChangePasswordHandle(c *gin.Context) {
 		return
 	}
 
+	if err := validatePassword(body.NewPassword); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+
+		return
+	}
+
 	if err := models.UpdatePassword(&user.Id, body.NewPassword); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
