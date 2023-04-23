@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,12 +11,15 @@ import (
 )
 
 type createEventRequestBody struct {
-	Name      string
-	Date      string
-	Location  string
-	PriceInfo string `bson:"price_info" json:"price_info"`
-	Organizer string
-	Link      string
+	Name        string
+	Description string
+	Start       string
+	End         string
+	Identifier  string
+	Location    string
+	PriceInfo   string `bson:"price_info" json:"price_info"`
+	Organizer   string
+	Link        string
 }
 
 func CreateEventHandler(c *gin.Context) {
@@ -48,24 +50,49 @@ func CreateEventHandler(c *gin.Context) {
 		return
 	}
 
-	dateTime, err := time.Parse("2006-01-02", body.Date)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "invalid date format",
-		})
-
-		return
+	event := models.Event{
+		ID:          primitive.NewObjectID(),
+		Name:        body.Name,
+		Description: body.Description,
+		Location:    body.Location,
+		PriceInfo:   body.PriceInfo,
+		Organizer:   body.Organizer,
+		Link:        body.Link,
+		Creator:     user.Id,
 	}
 
-	event := models.Event{
-		ID:        primitive.NewObjectID(),
-		Name:      body.Name,
-		Date:      primitive.NewDateTimeFromTime(dateTime),
-		Location:  body.Location,
-		PriceInfo: body.PriceInfo,
-		Organizer: body.Organizer,
-		Link:      body.Link,
-		Creator:   user.Id,
+	if body.End != "" {
+		t, err := time.Parse(time.RFC3339, body.End)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "unable to parse end time",
+			})
+
+			return
+		}
+
+		datetime := primitive.NewDateTimeFromTime(t)
+
+		event.End = &datetime
+	}
+
+	if body.Start != "" {
+		t, err := time.Parse(time.RFC3339, body.Start)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "unable to parse start time",
+			})
+
+			return
+		}
+
+		datetime := primitive.NewDateTimeFromTime(t)
+
+		event.Start = &datetime
+	}
+
+	if body.Identifier != "" {
+		event.Identifier = &body.Identifier
 	}
 
 	id, err := models.CreateEvent(&event)
@@ -98,6 +125,11 @@ func ListEventsHandler(c *gin.Context) {
 		filter["organizer"] = bson.M{"$in": []string{organizerParam}}
 	}
 
+	identifierParam := c.Query("identifier")
+	if identifierParam != "" {
+		filter["identifier"] = bson.M{"$in": []string{identifierParam}}
+	}
+
 	markedParam := c.Query("marked")
 	if markedParam != "" {
 		if user == nil {
@@ -124,8 +156,6 @@ func ListEventsHandler(c *gin.Context) {
 	events, count, err := models.GetEvents(page, filter)
 
 	if err != nil {
-		fmt.Println(err)
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "error",
 		})
