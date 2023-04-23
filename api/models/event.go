@@ -13,17 +13,17 @@ import (
 )
 
 type Event struct {
-	ID          primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	Name        string             `json:"name"`
-	Description string
-	Start       *primitive.DateTime
-	End         *primitive.DateTime
-	Identifier  *string
-	Location    string
-	PriceInfo   string `bson:"price_info" json:"price_info"`
-	Organizer   string
-	Link        string
-	Creator     primitive.ObjectID
+	ID          primitive.ObjectID  `bson:"_id" json:"id,omitempty"`
+	Name        string              `json:"name"`
+	Description string              `json:"description"`
+	Start       *primitive.DateTime `json:"start"`
+	End         *primitive.DateTime `json:"end"`
+	Identifier  *string             `json:"identifier"`
+	Location    string              `json:"location"`
+	PriceInfo   string              `bson:"price_info" json:"price_info"`
+	Organizer   string              `json:"organizer"`
+	Link        string              `json:"link"`
+	Creator     primitive.ObjectID  `json:"creator"`
 }
 
 func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
@@ -45,18 +45,18 @@ func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
 }
 
 type ResponseEvent struct {
-	ID          primitive.ObjectID `json:"id,omitempty"`
-	Name        string             `json:"name"`
-	Description string
-	Start       *primitive.DateTime
-	End         *primitive.DateTime
-	Identifier  *string
-	Location    string
-	PriceInfo   string `json:"price_info"`
-	Organizer   string
-	Link        string
-	Creator     primitive.ObjectID
-	IsMarked    bool `json:"is_marked" binding:"required"`
+	ID          primitive.ObjectID  `json:"id,omitempty"`
+	Name        string              `json:"name"`
+	Description string              `json:"description"`
+	Start       *primitive.DateTime `json:"start"`
+	End         *primitive.DateTime `json:"end"`
+	Identifier  *string             `json:"identifier"`
+	Location    string              `json:"location"`
+	PriceInfo   string              `json:"price_info"`
+	Organizer   string              `json:"organizer"`
+	Link        string              `json:"link"`
+	Creator     primitive.ObjectID  `json:"creator"`
+	IsMarked    bool                `json:"is_marked" binding:"required"`
 }
 
 func fromEvent(event *Event) ResponseEvent {

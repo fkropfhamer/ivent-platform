@@ -9,8 +9,17 @@ interface Profile {
 }
 
 export interface Event {
-  name: string
   id: string
+  name: string
+  description: string
+  start: string
+  end: string
+  identifier: string
+  location: string
+  price_info: string
+  organizer: string
+  link: string
+  creator: string
   is_marked: boolean
 }
 
