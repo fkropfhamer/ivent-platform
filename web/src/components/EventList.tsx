@@ -4,11 +4,11 @@ import { type RootState } from '../app/store'
 import { useMarkEventMutation, useUnmarkEventMutation, type Event } from '../services/api'
 
 export const EventList = ({ events }: { events: Event[] }): JSX.Element => {
-  return <>
+  return (<>
         {events.map(event => (
             <EventCard event={event} key={event.id} />
         ))}
-    </>
+    </>)
 }
 
 const EventCard = ({ event }: { event: Event }): JSX.Element => {

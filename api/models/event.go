@@ -94,6 +94,7 @@ func GetEvents(page int64, filter bson.M) ([]Event, int64, error) {
 	defer cancel()
 
 	opts := options.FindOptions{
+		Sort:  bson.M{"start": 1},
 		Skip:  &skip,
 		Limit: &pageLimit,
 	}
