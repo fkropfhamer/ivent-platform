@@ -9,6 +9,7 @@ import (
 	"ivent-api/db"
 	"ivent-api/models"
 	"strconv"
+	"time"
 )
 
 func createConstantJWT(userID *primitive.ObjectID, role models.Role) string {
@@ -30,14 +31,21 @@ func createConstantJWT(userID *primitive.ObjectID, role models.Role) string {
 
 func createExampleEvents(testUser *models.User) {
 	for i := 0; i < 50; i++ {
+		start := primitive.NewDateTimeFromTime(time.Now().AddDate(0, 0, i))
+		end := primitive.NewDateTimeFromTime(start.Time().Add(time.Hour))
+		identifier := "identifier" + strconv.Itoa(i)
 		event := models.Event{
-			ID:        primitive.NewObjectID(),
-			Name:      "event" + strconv.Itoa(i),
-			Location:  "online",
-			PriceInfo: "free",
-			Organizer: "Organizer " + strconv.Itoa(i%3),
-			Link:      "https://example.com/",
-			Creator:   testUser.Id,
+			ID:          primitive.NewObjectID(),
+			Name:        "event" + strconv.Itoa(i),
+			Description: "example description",
+			Start:       &start,
+			End:         &end,
+			Identifier:  &identifier,
+			Location:    "online",
+			PriceInfo:   "free",
+			Organizer:   "Organizer " + strconv.Itoa(i%3),
+			Link:        "https://example.com/",
+			Creator:     testUser.Id,
 		}
 
 		_, err := models.CreateEvent(&event)
