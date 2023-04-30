@@ -16,6 +16,7 @@ type Event struct {
 	ID          primitive.ObjectID  `bson:"_id" json:"id,omitempty"`
 	Name        string              `json:"name"`
 	Description string              `json:"description"`
+	Category    string              `json:"category"`
 	Start       *primitive.DateTime `json:"start"`
 	End         *primitive.DateTime `json:"end"`
 	Identifier  *string             `json:"identifier"`
@@ -48,6 +49,7 @@ type ResponseEvent struct {
 	ID          primitive.ObjectID  `json:"id,omitempty"`
 	Name        string              `json:"name"`
 	Description string              `json:"description"`
+	Category    string              `json:"category"`
 	Start       *primitive.DateTime `json:"start"`
 	End         *primitive.DateTime `json:"end"`
 	Identifier  *string             `json:"identifier"`
@@ -64,6 +66,7 @@ func fromEvent(event *Event) ResponseEvent {
 		ID:          event.ID,
 		Name:        event.Name,
 		Description: event.Description,
+		Category:    event.Category,
 		Start:       event.Start,
 		End:         event.End,
 		Identifier:  event.Identifier,
