@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from scraper.models.event import Event
+from models.event import Event
 
 
 def scrape_staatsoper(api_client, dry_run=False):

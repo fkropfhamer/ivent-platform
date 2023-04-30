@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup
 import logging
 import pytz
 
-from scraper.api_client import ApiClient
-from scraper.models.event import Event
+from api_client import ApiClient
+from models.event import Event
 
 
 def scrape_lmu_cs(api_client: ApiClient, dry_run=False):
