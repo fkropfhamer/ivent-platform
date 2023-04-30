@@ -48,7 +48,8 @@ def scrape_lmu_cs(api_client: ApiClient, dry_run=False):
         identifier = extract_identifier_from_registration_link(registration_link)
 
         event = Event(name=name, start=start_date, end=end_date, identifier=identifier, link=registration_link,
-                      location=location, organizer="LMU Career Service", description=description, category="LMU-CS_" + event_type)
+                      location=location, organizer="LMU Career Service", description=description,
+                      category="LMU-CS_Event")
         count += 1
 
         if not dry_run:
