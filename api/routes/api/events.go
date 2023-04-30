@@ -13,6 +13,7 @@ import (
 type createEventRequestBody struct {
 	Name        string
 	Description string
+	Category    string
 	Start       string
 	End         string
 	Identifier  string
@@ -54,6 +55,7 @@ func CreateEventHandler(c *gin.Context) {
 		ID:          primitive.NewObjectID(),
 		Name:        body.Name,
 		Description: body.Description,
+		Category:    body.Category,
 		Location:    body.Location,
 		PriceInfo:   body.PriceInfo,
 		Organizer:   body.Organizer,

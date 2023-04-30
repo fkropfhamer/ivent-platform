@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from scraper.models.event import Event
+from models.event import Event
 
 
 def scrape_staatsoper(api_client, dry_run=False):
@@ -42,21 +42,23 @@ def scrape_staatsoper(api_client, dry_run=False):
             group_rows = group.find_all('div', class_='activity-list__row')
             for group_row in group_rows:
                 name = group_row.find('h3').text.strip()
+
                 time_and_location_text = group_row.find('div', class_='activity-list__text').find('span').text
                 location = time_and_location_text.split("|")[1].strip()
                 date = group_row['data-date']
-                time = time_and_location_text.split("|")[0].strip()[:5]
-                start = datetime.strptime(date + " " + time, "%Y-%m-%d %H.%M").astimezone(pytz.timezone('Europe/Berlin'))
+                start = build_start_datetime(date, time_and_location_text)
 
-                price_info = group_row.find('p', class_='activity-list-price-info').find('span').text.strip().replace(
-                    "\n", "")
+                category_text = group_row.find('div', class_='activity-list__channel hide-on-md').text.strip()
+                category = determine_category(category_text)
+                price_info = group_row.find('p', class_='activity-list-price-info').find('span').text.strip()\
+                    .replace("\n", "")
                 organizer = "Bayerische Staatsoper"
                 link = "https://www.staatsoper.de" + group_row.find('a', class_='activity-list__content')['href']
 
                 identifier = group_row.find('input', class_='activity-list--toggle')['value']
 
                 event = Event(name=name, start=start, location=location, price_info=price_info, organizer=organizer,
-                              link=link, identifier=identifier)
+                              link=link, identifier=identifier, category=category)
                 logger.debug(event)
                 events.append(event)
 
@@ -70,3 +72,17 @@ def scrape_staatsoper(api_client, dry_run=False):
 
     logger.info(f"scraped {len(events)} events")
     logger.info("finished scrapping staatsoper")
+
+
+def build_start_datetime(date, time_and_location_text):
+    time = time_and_location_text.split("|")[0].strip()[:5]
+    return datetime.strptime(date + " " + time, "%Y-%m-%d %H.%M").astimezone(pytz.timezone('Europe/Berlin'))
+
+
+def determine_category(category_text):
+    main_event_types = ["ballett", "oper", "konzert"]
+    if category_text.lower() in main_event_types:
+        category = category_text.title()
+    else:
+        category = "Staatsoper_Extra"
+    return category

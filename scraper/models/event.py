@@ -1,5 +1,6 @@
 class Event:
-    def __init__(self, name, start=None, end=None, identifier=None, location=None, price_info=None, organizer=None, link=None, description=None):
+    def __init__(self, name, start=None, end=None, identifier=None, location=None, price_info=None,
+                 organizer=None, link=None, description=None, category=None):
         self.name = name
         self.start = start
         self.end = end
@@ -9,6 +10,7 @@ class Event:
         self.link = link
         self.identifier = identifier
         self.description = description
+        self.category = category
 
     def __str__(self):
         return f"Event: {self.name}\nStart: {self.start}\nLocation: {self.location}\nPrice Info: {self.price_info}\n" \
@@ -31,4 +33,5 @@ class Event:
             "link": self.link,
             "identifier": self.identifier,
             "description": self.description,
+            "category": self.category
         }
