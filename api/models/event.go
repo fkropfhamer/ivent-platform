@@ -27,12 +27,12 @@ type Event struct {
 	Creator     primitive.ObjectID  `json:"creator"`
 }
 
-func CreateEvent(newEvent *Event) (*primitive.ObjectID, error) {
+func (event *Event) Save() (*primitive.ObjectID, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := db.EventsCollection.InsertOne(ctx, newEvent)
+	result, err := db.EventsCollection.InsertOne(ctx, event)
 
 	if err != nil {
 		return nil, errors.New("insertion failed")
@@ -161,6 +161,17 @@ func GetEvent(id string) (*Event, error) {
 	}
 
 	return &event, nil
+}
+
+func (event *Event) Delete() error {
+	filter := bson.M{"_id": event.ID}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if _, err := db.EventsCollection.DeleteOne(ctx, filter); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func DeleteEvent(id string) error {

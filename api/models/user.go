@@ -50,7 +50,7 @@ func hashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func CreateUser(newUser *User) error {
+func (newUser *User) Save() error {
 	passwordHash, err := hashPassword(newUser.Password)
 
 	if err != nil {

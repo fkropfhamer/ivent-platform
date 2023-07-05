@@ -97,7 +97,7 @@ func CreateEventHandler(c *gin.Context) {
 		event.Identifier = &body.Identifier
 	}
 
-	id, err := models.CreateEvent(&event)
+	id, err := event.Save()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "error",

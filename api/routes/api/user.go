@@ -49,7 +49,7 @@ func CreateUserHandle(c *gin.Context) {
 		Name: body.Username,
 	}
 
-	err := models.CreateUser(&newUser)
+	err := newUser.Save()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -95,7 +95,7 @@ func CreateUserByAdminHandle(c *gin.Context) {
 		Role: body.Role,
 	}
 
-	err = models.CreateUser(&newUser)
+	err = newUser.Save()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -193,7 +193,7 @@ func RegisterHandle(c *gin.Context) {
 		Role:     models.RoleUser,
 	}
 
-	err = models.CreateUser(&newUser)
+	err = newUser.Save()
 
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
