@@ -19,10 +19,15 @@ func CreateUser() {
 		return
 	}
 
-	fmt.Printf("Username: %s, Password: %s\n", username, password)
+	role, err := getRole()
+	if err != nil {
+		fmt.Print("Something went wrong :(")
+		return
+	}
 
 	user := models.User{
 		Id:       primitive.NewObjectID(),
+		Role:     role,
 		Name:     username,
 		Password: password,
 	}
@@ -32,7 +37,23 @@ func CreateUser() {
 		return
 	}
 
-	fmt.Printf("User %s was succesfully created \n", username)
+	fmt.Printf("User %s with Role %s was succesfully created \n", username, role)
+}
+
+func getRole() (models.Role, error) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("[0] RoleUser, [1] RoleAdmin")
+	fmt.Print("Choose Role: ")
+	roleIndex, err := reader.ReadString('\n')
+	if err != nil {
+		return "", err
+	}
+
+	if strings.TrimSpace(roleIndex) == "1" {
+		return models.RoleAdmin, nil
+	}
+
+	return models.RoleUser, nil
 }
 
 // https://stackoverflow.com/a/32768479/14280311 thank you! 🙏
